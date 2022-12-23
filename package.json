@@ -18,10 +18,13 @@
     "test": "yarn --cwd app test",
     "test:watch": "yarn --cwd app test:watch",
     "lint": "yarn --cwd app lint",
-    "lint:report": "yarn --cwd app lint:report"
+    "lint:report": "yarn --cwd app lint:report",
+    "deploy:dev": "vercel",
+    "deploy:prod": "vercel --prod"
   },
   "devDependencies": {
-    "husky": ">=6"
+    "husky": ">=6",
+    "vercel": "^28.10.1"
   },
   "lint-staged": {
     "app/**/*.{js,jsx,ts,tsx}": "eslint"
