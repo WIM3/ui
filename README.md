@@ -2,8 +2,7 @@
 
 # Description
 
-[Infinix Documentation](https://app.clickup.com/20655476/v/dc/kpbbm-79368/kpbbm-23808)
-
+TBD
 
 # Breakdown
 
