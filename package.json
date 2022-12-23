@@ -23,7 +23,8 @@
     "deploy:prod": "vercel --prod"
   },
   "devDependencies": {
-    "husky": ">=6"
+    "husky": ">=6",
+    "vercel": "^28.10.1"
   },
   "lint-staged": {
     "app/**/*.{js,jsx,ts,tsx}": "eslint"
