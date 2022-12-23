@@ -16,18 +16,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy - DEV
-        uses: |
+      - uses: |
           actions/checkout@v3
           actions/setup-node@v3
+      - name: Deploy - DEV
         if: ${{ github.ref == 'refs/heads/dev' }}
         run: |
           yarn install --immutable
           yarn vercel --token=${{ secrets.VERCEL_TOKEN }}
       - name: Deploy - PROD
-        uses: |
-          actions/checkout@v3
-          actions/setup-node@v3
         if: ${{ github.ref == 'refs/heads/main' }}
         run: |
           yarn install --immutable
