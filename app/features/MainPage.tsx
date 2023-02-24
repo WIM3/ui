@@ -5,7 +5,7 @@ import {
   useSocketConnection,
   useSocketPriceFeed,
   useSocketRecentPositions,
-  useSocketUserPositions,
+  useSocketUserPositions
 } from "@/hooks/socket";
 import { useNotistack } from "@/hooks/useNotistack";
 import { useMetamaskConnection } from "@/hooks/wallet";

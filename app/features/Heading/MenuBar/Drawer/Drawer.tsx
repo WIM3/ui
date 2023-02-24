@@ -1,18 +1,18 @@
 import { AlertNotification, AlertNotificationProps } from "@/components";
-import { Box, Drawer as MuiDrawer, Typography } from "@mui/material";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import NotificationsNoneOutlinedIcon from "@mui/icons-material/NotificationsNoneOutlined";
+import { Box, Drawer as MuiDrawer, Typography } from "@mui/material";
 
-import { containerStyle, iconStyle, titleStyle } from "./Drawer.styles";
-import { Selections } from "../ButtonBar/types";
 import Image from "next/image";
-import { Wallets } from "./Wallets";
+import { Selections } from "../ButtonBar/types";
+import { containerStyle, iconStyle, titleStyle } from "./Drawer.styles";
 import { Notifications } from "./Notifications";
+import { Wallets } from "./Wallets";
 
 const titleMapping = {
   [Selections.notifications]: "Notifications",
   [Selections.wallet]: "Wallets",
-  [Selections.menu]: "Infinix",
+  [Selections.menu]: "Traders Island",
 };
 
 const iconMapping = {
@@ -20,10 +20,10 @@ const iconMapping = {
   [Selections.wallet]: AccountBalanceWalletOutlinedIcon,
   [Selections.menu]: () => (
     <Image
-      src="/static/infinix.svg"
-      width={49}
+      src="/static/logo.svg"
+      width={24}
       height={24}
-      alt="Infinix Logo"
+      alt="Traders Island Logo"
     />
   ),
 };
@@ -58,7 +58,7 @@ export const Drawer = ({
       )}
       <Box sx={titleStyle(showNotification || false)}>
         <IconComponent sx={iconStyle} />
-        <Typography variant="h6">{title}</Typography>
+        <Typography variant="subtitle1">{title}</Typography>
       </Box>
       {selected === Selections.wallet && <Wallets />}
       {selected === Selections.notifications && <Notifications />}

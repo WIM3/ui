@@ -1,15 +1,18 @@
 /* istanbul ignore file */
-import { AppBar, Toolbar } from "@mui/material";
+import { AppBar, Box, Toolbar, Typography } from "@mui/material";
 import Image from "next/image";
 
-import { appBarStyle, toolBarStyle } from "./Heading.styles";
+import { appBarStyle, logoStyle, logoTextStyle, toolBarStyle } from "./Heading.styles";
 import { MenuBar } from "./MenuBar";
 
 export const Heading = () => {
   return (
     <AppBar sx={appBarStyle}>
       <Toolbar sx={toolBarStyle}>
-        <Image src="/static/logo.svg" alt="App Logo" height={16} width={106} />
+        <Box sx={logoStyle}>
+          <Image src="/static/logo.svg" alt="App Logo" height={33} width={33} />
+          <Typography sx={logoTextStyle}>Traders Island</Typography>
+        </Box>
         <MenuBar />
       </Toolbar>
     </AppBar>
