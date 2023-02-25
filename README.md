@@ -1,4 +1,4 @@
-# Infinix UI application
+# Traders Island UI application
 
 # Description
 

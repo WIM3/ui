@@ -18,3 +18,20 @@ export const toolBarStyle = {
   justifyContent: "space-between",
   height: "100%",
 };
+
+export const logoStyle = {
+  display: "flex",
+  gap: "1rem",
+  alignItems: "center",
+}
+
+export const logoTextStyle = (theme: Theme) => ({
+  display: "none",
+  [theme.breakpoints.up("md")]: {
+    display: "block",
+    fontSize: "1rem",
+  },
+  [theme.breakpoints.up("lg")]: {
+    fontSize: "1.1875rem",
+  },
+});
