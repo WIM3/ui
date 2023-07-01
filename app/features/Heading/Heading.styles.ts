@@ -23,7 +23,7 @@ export const logoStyle = {
   display: "flex",
   gap: "1rem",
   alignItems: "center",
-}
+};
 
 export const logoTextStyle = (theme: Theme) => ({
   display: "none",

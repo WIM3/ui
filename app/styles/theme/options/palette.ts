@@ -16,10 +16,10 @@ export const paletteOptions = {
       dark: "#272A4F",
       graishLavender: "#8186AE",
       lavender: "#4A518B",
-      blackberry: "#272A4F",
-      deepBlackberry: "#202443",
-      deeperBlackberry: "#1B1F3E",
-      deepestBlackberry: "#151933",
+      blackberry: "#2C274F",
+      deepBlackberry: "#292043",
+      deeperBlackberry: "#241B3E",
+      deepestBlackberry: "#201137",
     },
     alert: {
       blueberry: "#46B1FF",
@@ -56,7 +56,7 @@ export const paletteOptions = {
       dark: "#C35E00",
     },
     common: {
-      white: "#FFFFFF",
+      white: "#FFFEEB",
       black: "#000000",
     },
     featured: {

@@ -1,6 +1,6 @@
 {
-  "name": "ui-traders-island",
-  "version": "0.1.0",
+  "name": "ui-galleon",
+  "version": "0.1.1",
   "main": "index.js",
   "repository": "git@github.com:WIM3/ui.git",
   "author": "Daniel Palanki <daniel.palanki79@gmail.com>",

@@ -1,4 +1,4 @@
-# Traders Island UI application
+# Galleon UI application
 
 # Description
 
