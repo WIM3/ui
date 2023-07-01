@@ -12,19 +12,14 @@ import { Wallets } from "./Wallets";
 const titleMapping = {
   [Selections.notifications]: "Notifications",
   [Selections.wallet]: "Wallets",
-  [Selections.menu]: "Traders Island",
+  [Selections.menu]: "Galleon",
 };
 
 const iconMapping = {
   [Selections.notifications]: NotificationsNoneOutlinedIcon,
   [Selections.wallet]: AccountBalanceWalletOutlinedIcon,
   [Selections.menu]: () => (
-    <Image
-      src="/static/logo.svg"
-      width={24}
-      height={24}
-      alt="Traders Island Logo"
-    />
+    <Image src="/static/logo.svg" width={24} height={24} alt="Galleon Logo" />
   ),
 };
 

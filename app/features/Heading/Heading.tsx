@@ -2,7 +2,12 @@
 import { AppBar, Box, Toolbar, Typography } from "@mui/material";
 import Image from "next/image";
 
-import { appBarStyle, logoStyle, logoTextStyle, toolBarStyle } from "./Heading.styles";
+import {
+  appBarStyle,
+  logoStyle,
+  logoTextStyle,
+  toolBarStyle,
+} from "./Heading.styles";
 import { MenuBar } from "./MenuBar";
 
 export const Heading = () => {
@@ -11,7 +16,7 @@ export const Heading = () => {
       <Toolbar sx={toolBarStyle}>
         <Box sx={logoStyle}>
           <Image src="/static/logo.svg" alt="App Logo" height={33} width={33} />
-          <Typography sx={logoTextStyle}>Traders Island</Typography>
+          <Typography sx={logoTextStyle}>Galleon</Typography>
         </Box>
         <MenuBar />
       </Toolbar>
