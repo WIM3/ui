@@ -5,11 +5,11 @@ export enum PositionChangeStatuses {
 }
 
 export enum OriginalPositionChangeStatuses {
-  Open = "Opening",
-  Close = "Closing",
-  Chng = "Changing",
-  Mgn = "Margin Changing",
-  Liq = "Liquidating",
+  Opening = "Opening",
+  Closing = "Closing",
+  Changing = "Changing",
+  MarginChangin = "Margin Changing",
+  Liquidating = "Liquidating",
   None = "Invalid",
 }
 
@@ -17,14 +17,14 @@ export const mapOriginalPositionStatus = (
   status: OriginalPositionChangeStatuses
 ) => {
   const openStatuses = [
-    OriginalPositionChangeStatuses.Open,
-    OriginalPositionChangeStatuses.Chng,
-    OriginalPositionChangeStatuses.Mgn,
+    OriginalPositionChangeStatuses.Opening,
+    OriginalPositionChangeStatuses.Changing,
+    OriginalPositionChangeStatuses.MarginChangin,
   ];
 
   return openStatuses.includes(status)
     ? PositionChangeStatuses.Open
-    : OriginalPositionChangeStatuses.Close === status
-    ? PositionChangeStatuses.Closed
-    : PositionChangeStatuses.Liquidated;
+    : OriginalPositionChangeStatuses.Closing === status
+      ? PositionChangeStatuses.Closed
+      : PositionChangeStatuses.Liquidated;
 };

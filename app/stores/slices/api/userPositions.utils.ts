@@ -47,8 +47,8 @@ export const transformHistory = (
     .reduce((target: UserPositionEvent[], { position, history }) => {
       const enhancedHistory = history.map((current, idx) => {
         const isMarginChanging =
-          current.type === OriginalPositionChangeStatuses.Mgn;
-        const isClosing = current.type === OriginalPositionChangeStatuses.Close;
+          current.type === OriginalPositionChangeStatuses.MarginChangin;
+        const isClosing = current.type === OriginalPositionChangeStatuses.Closing;
         const prevEntry =
           (isMarginChanging || isClosing) && idx > 0 ? history[idx - 1] : {};
         const defaultProps = {
@@ -202,11 +202,11 @@ export const createNotificationHistoryData = (
     };
     const additionalRows = isOpen
       ? [
-          { label: "Entry Price", value: formatUsdValue(entryPrice) },
-          { label: "Mark Price", value: formatUsdValue(markPrice) },
-          { label: "Position Size", value: formatNumber(size, { base: 2 }) },
-          { label: "Liq. Price (est.)", value: "" },
-        ]
+        { label: "Entry Price", value: formatUsdValue(entryPrice) },
+        { label: "Mark Price", value: formatUsdValue(markPrice) },
+        { label: "Position Size", value: formatNumber(size, { base: 2 }) },
+        { label: "Liq. Price (est.)", value: "" },
+      ]
       : [{ label: "PnL (ROE%)", value: formatUsdValue(realizedPnl) }];
 
     return {

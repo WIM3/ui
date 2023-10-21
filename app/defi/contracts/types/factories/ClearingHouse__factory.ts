@@ -11,19 +11,13 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
         internalType: "address",
-        name: "previousAdmin",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address",
-        name: "newAdmin",
+        name: "delegateApproval",
         type: "address",
       },
     ],
-    name: "AdminChanged",
+    name: "DelegateApprovalChanged",
     type: "event",
   },
   {
@@ -32,169 +26,14 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "implementation",
-        type: "address",
-      },
-    ],
-    name: "Upgraded",
-    type: "event",
-  },
-  {
-    stateMutability: "payable",
-    type: "fallback",
-  },
-  {
-    inputs: [],
-    name: "admin",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "newAdmin",
-        type: "address",
-      },
-    ],
-    name: "changeAdmin",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "implementation",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "newImplementation",
-        type: "address",
-      },
-    ],
-    name: "upgradeTo",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "newImplementation",
-        type: "address",
-      },
-      {
-        internalType: "bytes",
-        name: "data",
-        type: "bytes",
-      },
-    ],
-    name: "upgradeToAndCall",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    stateMutability: "payable",
-    type: "receive",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "bool",
-        name: "isProvider",
-        type: "bool",
-      },
-    ],
-    name: "BackstopLiquidityProviderChanged",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "initMarginRatio",
-        type: "uint256",
-      },
-    ],
-    name: "InitMarginRatioChanged",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "address",
-        name: "insuranceFund",
-        type: "address",
-      },
-    ],
-    name: "InsuranceFundChanged",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "liquidationFeeRatio",
-        type: "uint256",
-      },
-    ],
-    name: "LiquidationFeeRatioChanged",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "sender",
+        name: "trader",
         type: "address",
       },
       {
         indexed: true,
         internalType: "address",
-        name: "amm",
+        name: "baseToken",
         type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "int256",
-        name: "amount",
-        type: "int256",
       },
       {
         indexed: false,
@@ -203,20 +42,68 @@ const _abi = [
         type: "int256",
       },
     ],
-    name: "MarginChanged",
+    name: "FundingPaymentSettled",
     type: "event",
   },
   {
     anonymous: false,
     inputs: [
       {
+        indexed: true,
+        internalType: "address",
+        name: "maker",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "baseToken",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "quoteToken",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "int24",
+        name: "lowerTick",
+        type: "int24",
+      },
+      {
+        indexed: false,
+        internalType: "int24",
+        name: "upperTick",
+        type: "int24",
+      },
+      {
+        indexed: false,
+        internalType: "int256",
+        name: "base",
+        type: "int256",
+      },
+      {
+        indexed: false,
+        internalType: "int256",
+        name: "quote",
+        type: "int256",
+      },
+      {
+        indexed: false,
+        internalType: "int128",
+        name: "liquidity",
+        type: "int128",
+      },
+      {
         indexed: false,
         internalType: "uint256",
-        name: "marginRatio",
+        name: "quoteFee",
         type: "uint256",
       },
     ],
-    name: "MarginRatioChanged",
+    name: "LiquidityChanged",
     type: "event",
   },
   {
@@ -257,68 +144,25 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "amm",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "trader",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "int256",
-        name: "newPositionSize",
-        type: "int256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "oldLiquidityIndex",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "newLiquidityIndex",
-        type: "uint256",
-      },
-    ],
-    name: "PositionAdjusted",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
         name: "trader",
         type: "address",
       },
       {
         indexed: true,
         internalType: "address",
-        name: "amm",
+        name: "baseToken",
         type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "margin",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "positionNotional",
-        type: "uint256",
       },
       {
         indexed: false,
         internalType: "int256",
         name: "exchangedPositionSize",
+        type: "int256",
+      },
+      {
+        indexed: false,
+        internalType: "int256",
+        name: "exchangedPositionNotional",
         type: "int256",
       },
       {
@@ -330,7 +174,7 @@ const _abi = [
       {
         indexed: false,
         internalType: "int256",
-        name: "positionSizeAfter",
+        name: "openNotional",
         type: "int256",
       },
       {
@@ -341,33 +185,9 @@ const _abi = [
       },
       {
         indexed: false,
-        internalType: "int256",
-        name: "unrealizedPnlAfter",
-        type: "int256",
-      },
-      {
-        indexed: false,
         internalType: "uint256",
-        name: "badDebt",
+        name: "sqrtPriceAfterX96",
         type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "liquidationPenalty",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "spotPrice",
-        type: "uint256",
-      },
-      {
-        indexed: false,
-        internalType: "int256",
-        name: "fundingPayment",
-        type: "int256",
       },
     ],
     name: "PositionChanged",
@@ -385,7 +205,56 @@ const _abi = [
       {
         indexed: true,
         internalType: "address",
-        name: "amm",
+        name: "baseToken",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "int256",
+        name: "closedPositionSize",
+        type: "int256",
+      },
+      {
+        indexed: false,
+        internalType: "int256",
+        name: "closedPositionNotional",
+        type: "int256",
+      },
+      {
+        indexed: false,
+        internalType: "int256",
+        name: "openNotional",
+        type: "int256",
+      },
+      {
+        indexed: false,
+        internalType: "int256",
+        name: "realizedPnl",
+        type: "int256",
+      },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "closedPrice",
+        type: "uint256",
+      },
+    ],
+    name: "PositionClosed",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        indexed: true,
+        internalType: "address",
+        name: "baseToken",
         type: "address",
       },
       {
@@ -412,39 +281,8 @@ const _abi = [
         name: "liquidator",
         type: "address",
       },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "badDebt",
-        type: "uint256",
-      },
     ],
     name: "PositionLiquidated",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: "address",
-        name: "amm",
-        type: "address",
-      },
-      {
-        indexed: true,
-        internalType: "address",
-        name: "trader",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "uint256",
-        name: "valueTransferred",
-        type: "uint256",
-      },
-    ],
-    name: "PositionSettled",
     type: "event",
   },
   {
@@ -464,19 +302,26 @@ const _abi = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
+        indexed: true,
         internalType: "address",
-        name: "amm",
+        name: "forwarder",
         type: "address",
       },
+    ],
+    name: "TrustedForwarderChanged",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
       {
         indexed: false,
-        internalType: "uint256",
-        name: "blockNumber",
-        type: "uint256",
+        internalType: "address",
+        name: "trustedForwarder",
+        type: "address",
       },
     ],
-    name: "RestrictionModeEntered",
+    name: "TrustedForwarderUpdated",
     type: "event",
   },
   {
@@ -495,24 +340,105 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "contract IAmm",
-        name: "_amm",
-        type: "address",
+        components: [
+          {
+            internalType: "address",
+            name: "baseToken",
+            type: "address",
+          },
+          {
+            internalType: "uint256",
+            name: "base",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "quote",
+            type: "uint256",
+          },
+          {
+            internalType: "int24",
+            name: "lowerTick",
+            type: "int24",
+          },
+          {
+            internalType: "int24",
+            name: "upperTick",
+            type: "int24",
+          },
+          {
+            internalType: "uint256",
+            name: "minBase",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "minQuote",
+            type: "uint256",
+          },
+          {
+            internalType: "bool",
+            name: "useTakerBalance",
+            type: "bool",
+          },
+          {
+            internalType: "uint256",
+            name: "deadline",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct IClearingHouse.AddLiquidityParams",
+        name: "params",
+        type: "tuple",
       },
+    ],
+    name: "addLiquidity",
+    outputs: [
       {
         components: [
           {
             internalType: "uint256",
-            name: "d",
+            name: "base",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "quote",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "fee",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "liquidity",
             type: "uint256",
           },
         ],
-        internalType: "struct Decimal.decimal",
-        name: "_addedMargin",
+        internalType: "struct IClearingHouse.AddLiquidityResponse",
+        name: "",
         type: "tuple",
       },
     ],
-    name: "addMargin",
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "maker",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "baseToken",
+        type: "address",
+      },
+    ],
+    name: "cancelAllExcessOrders",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -521,19 +447,23 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "",
+        name: "maker",
         type: "address",
       },
-    ],
-    name: "backstopLiquidityProviderMap",
-    outputs: [
       {
-        internalType: "bool",
-        name: "",
-        type: "bool",
+        internalType: "address",
+        name: "baseToken",
+        type: "address",
+      },
+      {
+        internalType: "bytes32[]",
+        name: "orderIds",
+        type: "bytes32[]",
       },
     ],
-    stateMutability: "view",
+    name: "cancelExcessOrders",
+    outputs: [],
+    stateMutability: "nonpayable",
     type: "function",
   },
   {
@@ -552,34 +482,60 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "contract IAmm",
-        name: "_amm",
-        type: "address",
-      },
-      {
         components: [
           {
+            internalType: "address",
+            name: "baseToken",
+            type: "address",
+          },
+          {
+            internalType: "uint160",
+            name: "sqrtPriceLimitX96",
+            type: "uint160",
+          },
+          {
             internalType: "uint256",
-            name: "d",
+            name: "oppositeAmountBound",
             type: "uint256",
           },
+          {
+            internalType: "uint256",
+            name: "deadline",
+            type: "uint256",
+          },
+          {
+            internalType: "bytes32",
+            name: "referralCode",
+            type: "bytes32",
+          },
         ],
-        internalType: "struct Decimal.decimal",
-        name: "_quoteAssetAmountLimit",
+        internalType: "struct IClearingHouse.ClosePositionParams",
+        name: "params",
         type: "tuple",
       },
     ],
     name: "closePosition",
-    outputs: [],
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "base",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "quote",
+        type: "uint256",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
     inputs: [],
-    name: "feePool",
+    name: "getAccountBalance",
     outputs: [
       {
-        internalType: "contract IMultiTokenRewardRecipient",
+        internalType: "address",
         name: "",
         type: "address",
       },
@@ -590,271 +546,17 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "contract IAmm",
-        name: "_amm",
+        internalType: "address",
+        name: "trader",
         type: "address",
       },
     ],
-    name: "getLatestCumulativePremiumFraction",
+    name: "getAccountValue",
     outputs: [
       {
-        components: [
-          {
-            internalType: "int256",
-            name: "d",
-            type: "int256",
-          },
-        ],
-        internalType: "struct SignedDecimal.signedDecimal",
+        internalType: "int256",
         name: "",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "contract IAmm",
-        name: "_amm",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "_trader",
-        type: "address",
-      },
-    ],
-    name: "getMarginRatio",
-    outputs: [
-      {
-        components: [
-          {
-            internalType: "int256",
-            name: "d",
-            type: "int256",
-          },
-        ],
-        internalType: "struct SignedDecimal.signedDecimal",
-        name: "",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "contract IAmm",
-        name: "_amm",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "_trader",
-        type: "address",
-      },
-    ],
-    name: "getPosition",
-    outputs: [
-      {
-        components: [
-          {
-            components: [
-              {
-                internalType: "int256",
-                name: "d",
-                type: "int256",
-              },
-            ],
-            internalType: "struct SignedDecimal.signedDecimal",
-            name: "size",
-            type: "tuple",
-          },
-          {
-            components: [
-              {
-                internalType: "uint256",
-                name: "d",
-                type: "uint256",
-              },
-            ],
-            internalType: "struct Decimal.decimal",
-            name: "margin",
-            type: "tuple",
-          },
-          {
-            components: [
-              {
-                internalType: "uint256",
-                name: "d",
-                type: "uint256",
-              },
-            ],
-            internalType: "struct Decimal.decimal",
-            name: "openNotional",
-            type: "tuple",
-          },
-          {
-            components: [
-              {
-                internalType: "int256",
-                name: "d",
-                type: "int256",
-              },
-            ],
-            internalType: "struct SignedDecimal.signedDecimal",
-            name: "lastUpdatedCumulativePremiumFraction",
-            type: "tuple",
-          },
-          {
-            internalType: "uint256",
-            name: "liquidityHistoryIndex",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "blockNumber",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct ClearingHouse.Position",
-        name: "",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "contract IAmm",
-        name: "_amm",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "_trader",
-        type: "address",
-      },
-      {
-        internalType: "enum ClearingHouse.PnlCalcOption",
-        name: "_pnlCalcOption",
-        type: "uint8",
-      },
-    ],
-    name: "getPositionNotionalAndUnrealizedPnl",
-    outputs: [
-      {
-        components: [
-          {
-            internalType: "uint256",
-            name: "d",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct Decimal.decimal",
-        name: "positionNotional",
-        type: "tuple",
-      },
-      {
-        components: [
-          {
-            internalType: "int256",
-            name: "d",
-            type: "int256",
-          },
-        ],
-        internalType: "struct SignedDecimal.signedDecimal",
-        name: "unrealizedPnl",
-        type: "tuple",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "contract IAmm",
-        name: "_amm",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "_trader",
-        type: "address",
-      },
-    ],
-    name: "getUnadjustedPosition",
-    outputs: [
-      {
-        components: [
-          {
-            components: [
-              {
-                internalType: "int256",
-                name: "d",
-                type: "int256",
-              },
-            ],
-            internalType: "struct SignedDecimal.signedDecimal",
-            name: "size",
-            type: "tuple",
-          },
-          {
-            components: [
-              {
-                internalType: "uint256",
-                name: "d",
-                type: "uint256",
-              },
-            ],
-            internalType: "struct Decimal.decimal",
-            name: "margin",
-            type: "tuple",
-          },
-          {
-            components: [
-              {
-                internalType: "uint256",
-                name: "d",
-                type: "uint256",
-              },
-            ],
-            internalType: "struct Decimal.decimal",
-            name: "openNotional",
-            type: "tuple",
-          },
-          {
-            components: [
-              {
-                internalType: "int256",
-                name: "d",
-                type: "int256",
-              },
-            ],
-            internalType: "struct SignedDecimal.signedDecimal",
-            name: "lastUpdatedCumulativePremiumFraction",
-            type: "tuple",
-          },
-          {
-            internalType: "uint256",
-            name: "liquidityHistoryIndex",
-            type: "uint256",
-          },
-          {
-            internalType: "uint256",
-            name: "blockNumber",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct ClearingHouse.Position",
-        name: "position",
-        type: "tuple",
+        type: "int256",
       },
     ],
     stateMutability: "view",
@@ -862,12 +564,116 @@ const _abi = [
   },
   {
     inputs: [],
-    name: "initMarginRatio",
+    name: "getClearingHouseConfig",
     outputs: [
       {
-        internalType: "uint256",
-        name: "d",
-        type: "uint256",
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getDelegateApproval",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getExchange",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getInsuranceFund",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getOrderBook",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getQuoteToken",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getTrustedForwarder",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getUniswapV3Factory",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "getVault",
+    outputs: [
+      {
+        internalType: "address",
+        name: "",
+        type: "address",
       },
     ],
     stateMutability: "view",
@@ -876,32 +682,44 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "uint256",
-        name: "_initMarginRatio",
-        type: "uint256",
+        internalType: "address",
+        name: "clearingHouseConfigArg",
+        type: "address",
       },
       {
-        internalType: "contract IInsuranceFund",
-        name: "_insuranceFund",
+        internalType: "address",
+        name: "vaultArg",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "quoteTokenArg",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "uniV3FactoryArg",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "exchangeArg",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "accountBalanceArg",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "insuranceFundArg",
         type: "address",
       },
     ],
     name: "initialize",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "insuranceFund",
-    outputs: [
-      {
-        internalType: "contract IInsuranceFund",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {
@@ -926,13 +744,36 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "contract IAmm",
-        name: "_amm",
+        internalType: "address",
+        name: "trader",
         type: "address",
       },
       {
         internalType: "address",
-        name: "_trader",
+        name: "baseToken",
+        type: "address",
+      },
+      {
+        internalType: "int256",
+        name: "positionSize",
+        type: "int256",
+      },
+    ],
+    name: "liquidate",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "baseToken",
         type: "address",
       },
     ],
@@ -944,147 +785,142 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "contract IAmm",
-        name: "_amm",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "_trader",
-        type: "address",
-      },
-      {
         components: [
           {
+            internalType: "address",
+            name: "baseToken",
+            type: "address",
+          },
+          {
+            internalType: "bool",
+            name: "isBaseToQuote",
+            type: "bool",
+          },
+          {
+            internalType: "bool",
+            name: "isExactInput",
+            type: "bool",
+          },
+          {
             internalType: "uint256",
-            name: "d",
+            name: "amount",
             type: "uint256",
           },
+          {
+            internalType: "uint256",
+            name: "oppositeAmountBound",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "deadline",
+            type: "uint256",
+          },
+          {
+            internalType: "uint160",
+            name: "sqrtPriceLimitX96",
+            type: "uint160",
+          },
+          {
+            internalType: "bytes32",
+            name: "referralCode",
+            type: "bytes32",
+          },
         ],
-        internalType: "struct Decimal.decimal",
-        name: "_quoteAssetAmountLimit",
+        internalType: "struct IClearingHouse.OpenPositionParams",
+        name: "params",
         type: "tuple",
       },
     ],
-    name: "liquidateWithSlippage",
+    name: "openPosition",
     outputs: [
       {
-        components: [
-          {
-            internalType: "uint256",
-            name: "d",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct Decimal.decimal",
-        name: "quoteAssetAmount",
-        type: "tuple",
+        internalType: "uint256",
+        name: "base",
+        type: "uint256",
       },
       {
-        internalType: "bool",
-        name: "isPartialClose",
-        type: "bool",
+        internalType: "uint256",
+        name: "quote",
+        type: "uint256",
       },
     ],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
-    inputs: [],
-    name: "liquidationFeeRatio",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "d",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "maintenanceMarginRatio",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "d",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
     inputs: [
       {
         internalType: "address",
-        name: "",
+        name: "trader",
         type: "address",
       },
+      {
+        components: [
+          {
+            internalType: "address",
+            name: "baseToken",
+            type: "address",
+          },
+          {
+            internalType: "bool",
+            name: "isBaseToQuote",
+            type: "bool",
+          },
+          {
+            internalType: "bool",
+            name: "isExactInput",
+            type: "bool",
+          },
+          {
+            internalType: "uint256",
+            name: "amount",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "oppositeAmountBound",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "deadline",
+            type: "uint256",
+          },
+          {
+            internalType: "uint160",
+            name: "sqrtPriceLimitX96",
+            type: "uint160",
+          },
+          {
+            internalType: "bytes32",
+            name: "referralCode",
+            type: "bytes32",
+          },
+        ],
+        internalType: "struct IClearingHouse.OpenPositionParams",
+        name: "params",
+        type: "tuple",
+      },
     ],
-    name: "openInterestNotionalMap",
+    name: "openPositionFor",
     outputs: [
       {
         internalType: "uint256",
-        name: "d",
+        name: "base",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "quote",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "fee",
         type: "uint256",
       },
     ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "contract IAmm",
-        name: "_amm",
-        type: "address",
-      },
-      {
-        internalType: "enum ClearingHouse.Side",
-        name: "_side",
-        type: "uint8",
-      },
-      {
-        components: [
-          {
-            internalType: "uint256",
-            name: "d",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct Decimal.decimal",
-        name: "_quoteAssetAmount",
-        type: "tuple",
-      },
-      {
-        components: [
-          {
-            internalType: "uint256",
-            name: "d",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct Decimal.decimal",
-        name: "_leverage",
-        type: "tuple",
-      },
-      {
-        components: [
-          {
-            internalType: "uint256",
-            name: "d",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct Decimal.decimal",
-        name: "_baseAssetAmountLimit",
-        type: "tuple",
-      },
-    ],
-    name: "openPosition",
-    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -1096,19 +932,6 @@ const _abi = [
         internalType: "address",
         name: "",
         type: "address",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "partialLiquidationRatio",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "d",
-        type: "uint256",
       },
     ],
     stateMutability: "view",
@@ -1137,38 +960,102 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "contract IAmm",
-        name: "_amm",
+        internalType: "address",
+        name: "trader",
+        type: "address",
+      },
+      {
+        internalType: "address",
+        name: "baseToken",
         type: "address",
       },
     ],
-    name: "payFunding",
-    outputs: [],
+    name: "quitMarket",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "base",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "quote",
+        type: "uint256",
+      },
+    ],
     stateMutability: "nonpayable",
     type: "function",
   },
   {
     inputs: [
       {
-        internalType: "contract IAmm",
-        name: "_amm",
-        type: "address",
+        components: [
+          {
+            internalType: "address",
+            name: "baseToken",
+            type: "address",
+          },
+          {
+            internalType: "int24",
+            name: "lowerTick",
+            type: "int24",
+          },
+          {
+            internalType: "int24",
+            name: "upperTick",
+            type: "int24",
+          },
+          {
+            internalType: "uint128",
+            name: "liquidity",
+            type: "uint128",
+          },
+          {
+            internalType: "uint256",
+            name: "minBase",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "minQuote",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "deadline",
+            type: "uint256",
+          },
+        ],
+        internalType: "struct IClearingHouse.RemoveLiquidityParams",
+        name: "params",
+        type: "tuple",
       },
+    ],
+    name: "removeLiquidity",
+    outputs: [
       {
         components: [
           {
             internalType: "uint256",
-            name: "d",
+            name: "base",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "quote",
+            type: "uint256",
+          },
+          {
+            internalType: "uint256",
+            name: "fee",
             type: "uint256",
           },
         ],
-        internalType: "struct Decimal.decimal",
-        name: "_removedMargin",
+        internalType: "struct IClearingHouse.RemoveLiquidityResponse",
+        name: "",
         type: "tuple",
       },
     ],
-    name: "removeMargin",
-    outputs: [],
     stateMutability: "nonpayable",
     type: "function",
   },
@@ -1183,69 +1070,11 @@ const _abi = [
     inputs: [
       {
         internalType: "address",
-        name: "account",
-        type: "address",
-      },
-      {
-        internalType: "bool",
-        name: "isProvider",
-        type: "bool",
-      },
-    ],
-    name: "setBackstopLiquidityProvider",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_feePool",
+        name: "delegateApprovalArg",
         type: "address",
       },
     ],
-    name: "setFeePool",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        components: [
-          {
-            internalType: "uint256",
-            name: "d",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct Decimal.decimal",
-        name: "_liquidationFeeRatio",
-        type: "tuple",
-      },
-    ],
-    name: "setLiquidationFeeRatio",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        components: [
-          {
-            internalType: "uint256",
-            name: "d",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct Decimal.decimal",
-        name: "_maintenanceMarginRatio",
-        type: "tuple",
-      },
-    ],
-    name: "setMaintenanceMarginRatio",
+    name: "setDelegateApproval",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -1266,19 +1095,12 @@ const _abi = [
   {
     inputs: [
       {
-        components: [
-          {
-            internalType: "uint256",
-            name: "d",
-            type: "uint256",
-          },
-        ],
-        internalType: "struct Decimal.decimal",
-        name: "_ratio",
-        type: "tuple",
+        internalType: "address",
+        name: "trader",
+        type: "address",
       },
     ],
-    name: "setPartialLiquidationRatio",
+    name: "settleAllFunding",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -1286,12 +1108,22 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "_whitelist",
-        type: "address",
+        internalType: "uint256",
+        name: "amount0Owed",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "amount1Owed",
+        type: "uint256",
+      },
+      {
+        internalType: "bytes",
+        name: "data",
+        type: "bytes",
       },
     ],
-    name: "setWhitelist",
+    name: "uniswapV3MintCallback",
     outputs: [],
     stateMutability: "nonpayable",
     type: "function",
@@ -1299,27 +1131,24 @@ const _abi = [
   {
     inputs: [
       {
-        internalType: "contract IAmm",
-        name: "_amm",
-        type: "address",
+        internalType: "int256",
+        name: "amount0Delta",
+        type: "int256",
+      },
+      {
+        internalType: "int256",
+        name: "amount1Delta",
+        type: "int256",
+      },
+      {
+        internalType: "bytes",
+        name: "data",
+        type: "bytes",
       },
     ],
-    name: "settlePosition",
+    name: "uniswapV3SwapCallback",
     outputs: [],
     stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "trustedForwarder",
-    outputs: [
-      {
-        internalType: "address",
-        name: "",
-        type: "address",
-      },
-    ],
-    stateMutability: "view",
     type: "function",
   },
   {
@@ -1346,29 +1175,8 @@ const _abi = [
         type: "string",
       },
     ],
-    stateMutability: "view",
+    stateMutability: "pure",
     type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "initialLogic",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "initialAdmin",
-        type: "address",
-      },
-      {
-        internalType: "bytes",
-        name: "_data",
-        type: "bytes",
-      },
-    ],
-    stateMutability: "payable",
-    type: "constructor",
   },
 ];
 

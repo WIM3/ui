@@ -7,27 +7,27 @@ import {
 describe("Positions", () => {
   test("should return Open for 'Opening', 'Changing', 'Margin Changing' statuses", () => {
     expect(
-      mapOriginalPositionStatus(OriginalPositionChangeStatuses.Open)
+      mapOriginalPositionStatus(OriginalPositionChangeStatuses.Opening)
     ).toEqual(PositionChangeStatuses.Open);
 
     expect(
-      mapOriginalPositionStatus(OriginalPositionChangeStatuses.Chng)
+      mapOriginalPositionStatus(OriginalPositionChangeStatuses.Changing)
     ).toEqual(PositionChangeStatuses.Open);
 
     expect(
-      mapOriginalPositionStatus(OriginalPositionChangeStatuses.Mgn)
+      mapOriginalPositionStatus(OriginalPositionChangeStatuses.MarginChangin)
     ).toEqual(PositionChangeStatuses.Open);
   });
 
   test("should return Closed for 'Closing' status", () => {
     expect(
-      mapOriginalPositionStatus(OriginalPositionChangeStatuses.Close)
+      mapOriginalPositionStatus(OriginalPositionChangeStatuses.Closing)
     ).toEqual(PositionChangeStatuses.Closed);
   });
 
   test("should return Liquidated for 'Liquidating' status", () => {
     expect(
-      mapOriginalPositionStatus(OriginalPositionChangeStatuses.Liq)
+      mapOriginalPositionStatus(OriginalPositionChangeStatuses.Liquidating)
     ).toEqual(PositionChangeStatuses.Liquidated);
   });
 });
