@@ -11,6 +11,7 @@ export enum TokenId {
   PICA = "PICA",
   CHAOS = "CHAOS",
   SOL = "SOL",
+  OP = "OP"
 }
 
 export type Token = {
@@ -56,6 +57,7 @@ export enum NetworkId {
   avalanche = 43114,
   moonriver = 1285,
   fantom = 250,
+  optimismTestnet = 420,
 }
 
 export type Network = {

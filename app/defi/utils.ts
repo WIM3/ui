@@ -84,7 +84,7 @@ export const getProduct = (value: ProductId): Product => {
 };
 
 export const isSupportedNetwork = (networkId?: NetworkId | null) => {
-  return [NetworkId.avalanche, NetworkId.avalancheTestnet].some(
+  return [NetworkId.avalanche, NetworkId.avalancheTestnet, NetworkId.optimismTestnet].some(
     (id) => id === networkId
   );
 };
@@ -93,6 +93,6 @@ export const getPairs = (marketId?: MarketId) => {
   return !marketId
     ? Object.values(PAIRS)
     : Object.values(PAIRS).filter((values) => {
-        return values.marketId === marketId;
-      });
+      return values.marketId === marketId;
+    });
 };

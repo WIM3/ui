@@ -16,7 +16,7 @@ const switchNetwork = (library: any) => () => {
   library.provider
     .request({
       method: "wallet_switchEthereumChain",
-      params: [{ chainId: getChainId(NetworkId.avalancheTestnet) }],
+      params: [{ chainId: getChainId(NetworkId.optimismTestnet) }],
     })
     .catch((error: any) => {
       if (error.code !== 4902) throw error;
@@ -26,16 +26,16 @@ const switchNetwork = (library: any) => () => {
           method: "wallet_addEthereumChain",
           params: [
             {
-              chainId: getChainId(NetworkId.avalancheTestnet),
-              chainName: NETWORKS[NetworkId.avalancheTestnet].name,
+              chainId: getChainId(NetworkId.optimismTestnet),
+              chainName: NETWORKS[NetworkId.optimismTestnet].name,
               nativeCurrency: {
-                name: NETWORKS[NetworkId.avalancheTestnet].nativeToken,
-                symbol: NETWORKS[NetworkId.avalancheTestnet].defaultTokenSymbol,
+                name: NETWORKS[NetworkId.optimismTestnet].nativeToken,
+                symbol: NETWORKS[NetworkId.optimismTestnet].defaultTokenSymbol,
                 decimals: 18,
               },
-              rpcUrls: [NETWORKS[NetworkId.avalancheTestnet].publicRpcUrl],
+              rpcUrls: [NETWORKS[NetworkId.optimismTestnet].publicRpcUrl],
               blockExplorerUrls: [
-                NETWORKS[NetworkId.avalancheTestnet].etherscanLink,
+                NETWORKS[NetworkId.optimismTestnet].etherscanLink,
               ],
             },
           ],
