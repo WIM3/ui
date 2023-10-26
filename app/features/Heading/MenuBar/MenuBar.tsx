@@ -25,8 +25,11 @@ export const MenuBar = () => {
     ? Notifications.active
     : Notifications.inactive;
 
-  const handleGetAvaxClick = () => {
-    window.open("https://faucet.avax.network/", "_blank");
+  const handleGetEthClick = () => {
+    window.open(
+      "https://community.optimism.io/docs/useful-tools/faucets/#testnet-faucets",
+      "_blank"
+    );
   };
 
   const handleGetUsdcClick = () => {
@@ -47,9 +50,9 @@ export const MenuBar = () => {
         variant="text"
         size="medium"
         disabled={!active}
-        onClick={handleGetAvaxClick}
+        onClick={handleGetEthClick}
       >
-        Get AVAX
+        Get ETH
       </Button>
 
       <ButtonBar
