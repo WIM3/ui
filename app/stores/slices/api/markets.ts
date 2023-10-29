@@ -28,7 +28,7 @@ export const createMarketsSlice: CustomStateCreator<MarketsSlice> = (
   markets: {
     list: {},
     marketId: MarketId.Crypto,
-    pairId: PairId.AVAXUSDC,
+    pairId: PairId.ETHUSDC, // Side menu on the right
     amm: "",
     ready: false,
 
@@ -60,6 +60,7 @@ export const createMarketsSlice: CustomStateCreator<MarketsSlice> = (
     // TODO: This should be done only once when setting the list with BE data
     getFlattenedPairs: () => {
       const markets = Object.entries(get().markets.list);
+      console.log("### ~ markets:", get().markets.list.Crypto);
       return markets.reduce((result, [, pairs]) => {
         // making sure all pair addresses are lowercase
         const pairsLowercase: { [pair: string]: string } = {};

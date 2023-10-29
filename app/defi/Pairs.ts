@@ -1,6 +1,7 @@
 import { CommodityId, IndexId, MarketId, Pair, PairId, TokenId } from "./types";
 
 export const PAIRS: { [key in PairId]: Pair } = {
+  // Crypto
   [PairId.BTCUSDC]: {
     id: PairId.BTCUSDC,
     marketId: MarketId.Crypto,
@@ -36,6 +37,7 @@ export const PAIRS: { [key in PairId]: Pair } = {
     marketId: MarketId.Crypto,
     productIds: [TokenId.SOL, TokenId.USDC],
   },
+  // SPPlatts
   [PairId.BATCH04]: {
     id: PairId.BATCH04,
     marketId: MarketId.SPPlatts,
@@ -56,6 +58,7 @@ export const PAIRS: { [key in PairId]: Pair } = {
     marketId: MarketId.SPPlatts,
     productIds: [IndexId.ACRCA00, TokenId.USDC],
   },
+  // SPIndices
   [PairId.SPBTC]: {
     id: PairId.SPBTC,
     marketId: MarketId.SPIndices,
@@ -66,11 +69,13 @@ export const PAIRS: { [key in PairId]: Pair } = {
     marketId: MarketId.SPIndices,
     productIds: [IndexId.SPETH, TokenId.USDC],
   },
+  // Commodities
   [PairId.GOOGUSDC]: {
     id: PairId.GOOGUSDC,
     marketId: MarketId.Commodities,
     productIds: [IndexId.GOOG, TokenId.USDC],
   },
+  // SP500
   [PairId.XAUUSD]: {
     id: PairId.XAUUSD,
     marketId: MarketId.SP500,

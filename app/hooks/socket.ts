@@ -4,6 +4,7 @@ import create from "zustand";
 
 import { useStore } from "@/stores/root";
 import { isAmmInfoValid } from "@/stores/slices/api/amm";
+import { MarketId, MARKETS, PairId } from "@/defi";
 
 interface SocketStore {
   socket: Socket;
@@ -70,12 +71,19 @@ export const useSocketConnection = () => {
   useEffect(() => {
     if (connected) return;
 
-    return addChannelCommunication(socket, SocketEvents.markets, (data) =>
-      setMarkets(data)
+    return addChannelCommunication(socket, SocketEvents.markets, (data) => {
+      //NOTE: This markets comes from BE via websocket.
+      data = addEthUsdMarket(data);
+      return setMarkets(data)
+    }
     );
   }, [socket, connected, setMarkets]);
 };
 
+// Fetch AMM Info from the API.
+// The API Fetch AMMInfo from SubGraph
+// Subgraph fetch AMMInfo from the blockchain
+// To put that in Subgraph we need to emit the ADDPOOL event from MarketRegistry.sol
 export const useSocketAmmInfo = () => {
   const { socket, connected } = useSocketStore((state) => state);
   const { setAmmInfo } = useStore((state) => state.amm);
@@ -147,3 +155,20 @@ export const useSocketRecentPositions = () => {
     );
   }, [amm, connected, socket, setPositions]);
 };
+
+interface Market {
+  [MarketId.Crypto]: {
+    [key in PairId]: string
+  }
+}
+
+const addEthUsdMarket = (markets: Market): Market => {
+
+  return {
+    ...markets,
+    [MarketId.Crypto]: {
+      ...markets[MarketId.Crypto],
+      [PairId.ETHUSDC]: "0x5e463a709e58088ed5f08Ee3AB6953Ae8f046889", // vETH/vUSDC Pool
+    },
+  }
+}

@@ -38,6 +38,7 @@ export const generatePairDropdownProps = (
   marketId: MarketId
 ): PairDropdownConfig => {
   const pairList = useStore.getState().markets.getFlattenedPairs();
+  console.log("### ~ pairList:", pairList);
   const options = getPairs(marketId)
     .filter((pair) => !!pairList[pair.id])
     .map((pair) => ({
