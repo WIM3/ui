@@ -62,7 +62,6 @@ export const createAmmSlice: CustomStateCreator<AmmSlice> = (set, get) => ({
             underlyingPrice: "0",
           };
 
-
           set(function setAmmInfo(state: AppState) {
 
             state.amm = { ...state.amm, ...amm };
@@ -71,10 +70,14 @@ export const createAmmSlice: CustomStateCreator<AmmSlice> = (set, get) => ({
         
        
       } else {
-
         if (handleError(get(), amm)) {
           return;
         }
+
+        set(function setAmmInfo(state: AppState) {
+
+          state.amm = { ...state.amm, ...amm };
+        });
       }
 
       

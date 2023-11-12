@@ -43,14 +43,15 @@ export const createPriceHistorySlice: CustomStateCreator<PriceHistorySlice> = (
         if (handleError(get(), feed)) {
           return;
         }
+   
+        set(function setPriceFeed(state: AppState) {
+          const [latest] = feed.history.slice(-1);
+          state.priceHistory.latest = latest?.price || "0";
+          state.priceHistory.feed = feed.history;
+          state.priceHistory.ready = true;
+        });
       }
 
-      // set(function setPriceFeed(state: AppState) {
-      //   const [latest] = feed.history.slice(-1);
-      //   state.priceHistory.latest = latest?.price || "0";
-      //   state.priceHistory.feed = feed.history;
-      //   state.priceHistory.ready = true;
-      // });
     },
 
     setReady: (ready: boolean) => {
@@ -102,7 +103,7 @@ export const getLatestPriceInfo = (state: AppState) => {
 const fetchCurrentEthUsdPriceFromPythNetwork = async (): Promise<Array<PriceUpdate>> => { 
   const symbol = 'Crypto.ETH/USD'
   const timeframe = '1D'
-  const from = Math.floor(new Date('2023-11-01').getTime()/1000).toString()
+  const from = Math.floor(new Date('2023-09-01').getTime()/1000).toString()
   const to =  (Math.floor(Date.now()/1000)).toString()
   const url = `https://benchmarks.pyth.network/v1/shims/tradingview/data_integration/history?symbol=${symbol}&resolution=${timeframe}&from=${from}&to=${to}`
 
