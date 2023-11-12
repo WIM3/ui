@@ -40,7 +40,6 @@ export const createAmmSlice: CustomStateCreator<AmmSlice> = (set, get) => ({
     ...getDefaultData(),
 
     setAmmInfo: (amm: Amm) => {
-      console.log("### ~ setAMMInfo:", amm);
       // SKIP Error return from API via WEBSOCKET because we added manually ETH/USD in the front
       if (typeof amm === "string" && (amm as string).includes("0x5e463a709e58088ed5f08ee3ab6953ae8f046889")) {
 
@@ -65,14 +64,14 @@ export const createAmmSlice: CustomStateCreator<AmmSlice> = (set, get) => ({
 
 
           set(function setAmmInfo(state: AppState) {
-            console.log('El state seteando el amm:', amm);
+
             state.amm = { ...state.amm, ...amm };
           });
         });
         
        
       } else {
-        console.log("Estamos en el else")
+
         if (handleError(get(), amm)) {
           return;
         }
