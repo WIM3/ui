@@ -21,7 +21,7 @@ module.exports = {
     "!**/stores/**",
     "!**/hooks/**",
   ],
-  collectCoverage: true,
+  collectCoverage: false,
   moduleNameMapper: {
     // Handle CSS imports (with CSS modules)
     // https://jestjs.io/docs/webpack#mocking-css-modules

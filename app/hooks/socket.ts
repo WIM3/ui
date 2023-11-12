@@ -80,6 +80,7 @@ export const useSocketConnection = () => {
   }, [socket, connected, setMarkets]);
 };
 
+// NOTE: This is to add the ETH/USDC market to the list of markets
 // Fetch AMM Info from the API.
 // The API Fetch AMMInfo from SubGraph
 // Subgraph fetch AMMInfo from the blockchain
