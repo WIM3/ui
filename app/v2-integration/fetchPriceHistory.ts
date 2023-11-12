@@ -1,6 +1,15 @@
 import { PriceUpdate } from "@/types/api";
 import { utils } from "ethers";
 
+interface PriceHistoryDto { 
+  t: Array<number> // timestamps
+  c: Array<number> // close prices
+  o: Array<number> // open prices
+  h: Array<number> // high prices
+  l: Array<number> // low prices
+  v: Array<number> // volume
+  s: string // status
+}
 
 export const fetchPriceEthUsdHistory = async (): Promise<Array<PriceUpdate>> => { 
   const symbol = 'Crypto.ETH/USD'
@@ -11,16 +20,16 @@ export const fetchPriceEthUsdHistory = async (): Promise<Array<PriceUpdate>> => 
   const url = `https://benchmarks.pyth.network/v1/shims/tradingview/data_integration/history?symbol=${symbol}&resolution=${timeframe}&from=${from}&to=${to}`
 
   const response = await fetch(url)
-  const data = await response.json()
-  
-  const mapToWei = (price: string) => { 
-    return utils.parseUnits(price, 8).toString()
-  }
+  const data: PriceHistoryDto = await response.json()
 
-  return data.t.map((timestamp: number, index: number) => { 
+  const mappedData = data.t.map((timestamp: number, index: number) => { 
+    const priceInWei = utils.parseUnits(data.c[index].toString(), 18)
     return {
       timestamp,
-      price: mapToWei(data.c[index].toString())
+      price: priceInWei.toString(),
     }
-  });
+  }) 
+
+  return mappedData;
 };
+
