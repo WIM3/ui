@@ -1,10 +1,9 @@
 import { useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 import create from "zustand";
-
 import { useStore } from "@/stores/root";
 import { isAmmInfoValid } from "@/stores/slices/api/amm";
-import { MarketId, MARKETS, PairId } from "@/defi";
+import { addEthUsdMarket } from "@/v2-integration/addMarket";
 
 interface SocketStore {
   socket: Socket;
@@ -157,19 +156,3 @@ export const useSocketRecentPositions = () => {
   }, [amm, connected, socket, setPositions]);
 };
 
-interface Market {
-  [MarketId.Crypto]: {
-    [key in PairId]: string
-  }
-}
-
-const addEthUsdMarket = (markets: Market): Market => {
-
-  return {
-    ...markets,
-    [MarketId.Crypto]: {
-      ...markets[MarketId.Crypto],
-      [PairId.ETHUSDC]: "0x5e463a709e58088ed5f08Ee3AB6953Ae8f046889", // vETH/vUSDC Pool
-    },
-  }
-}

@@ -1,5 +1,3 @@
-import { secondsToMilliseconds } from "date-fns";
-import { utils } from 'ethers'
 import { Amm } from "@/types/api";
 import {
   formatPercentage,
@@ -8,7 +6,10 @@ import {
 } from "@/utils/formatters";
 import { AppState, CustomStateCreator } from "../../types";
 import { handleError } from "../slices.utils";
-import { EvmPriceServiceConnection } from "@pythnetwork/pyth-evm-js";
+import { EthUsdPriceId, isEthUsPriceFeed } from "@/v2-integration/utils";
+import { fetchPriceEthUsdHistory } from "@/v2-integration/fetchPriceHistory";
+import { fetchCurrentEthUsdPriceFromPythNetwork } from "@/v2-integration/fetchTokenPrice";
+import { secondsToMilliseconds } from "date-fns";
 
 const getDefaultData = () => ({
   id: "",
@@ -41,20 +42,20 @@ export const createAmmSlice: CustomStateCreator<AmmSlice> = (set, get) => ({
 
     setAmmInfo: (amm: Amm) => {
       // SKIP Error return from API via WEBSOCKET because we added manually ETH/USD in the front
-      if (typeof amm === "string" && (amm as string).includes("0x5e463a709e58088ed5f08ee3ab6953ae8f046889")) {
+      if (isEthUsPriceFeed(amm)) {
 
-        fetchCurrentEthUsdPriceFromPythNetwork().then((ethUsdPrice) => { 
+        fetchCurrentEthUsdPriceFromPythNetwork().then((ethUsdPrice: number) => { 
           amm = {
             baseAssetReserve: "0",
-            dataFeedId: "0x5e463a709e58088ed5f08ee3ab6953ae8f046889",
+            dataFeedId: EthUsdPriceId,
             fundingBufferPeriod: 3600,
             fundingPeriod: 3600,
             fundingRate: "0",
-            id: "0x5e463a709e58088ed5f08ee3ab6953ae8f046889",
+            id: EthUsdPriceId,
             lastFunding: 0,
             nextFunding: 0,
             price: ethUsdPrice,
-            priceFeedKey: "0x5e463a709e58088ed5f08ee3ab6953ae8f046889",
+            priceFeedKey: EthUsdPriceId,
             quoteAsset: "USD",
             quoteAssetReserve: "0",
             tradeLimitRatio: "0",
@@ -125,24 +126,3 @@ export const isAmmInfoValid = ({ amm: { id, dataFeedId } }: AppState) => {
   return (!id && !dataFeedId) || (!!id && !!dataFeedId);
 };
 
-
-const fetchCurrentEthUsdPriceFromPythNetwork = async (): Promise<number> => { 
-  const connection = new EvmPriceServiceConnection(
-    "https://hermes-beta.pyth.network"
-  ); // See Hermes endpoints section below for other endpoints
-  
-  const priceIds = [
-    // You can find the ids of prices at https://pyth.network/developers/price-feed-ids#pyth-evm-testnet
-    "0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6", // ETH/USD price id in testnet
-  ];
-
-  // `getLatestPriceFeeds` returns a `PriceFeed` for each price id. It contains all information about a price and has
-  // utility functions to get the current and exponentially-weighted moving average price, and other functionality.
-  const priceFeeds = await connection.getLatestPriceFeeds(priceIds);
-  // Get the price if it is not older than 60 seconds from the current time.
-  const latestEthUsdPrice = priceFeeds![0].getPriceNoOlderThan(60); // Price { conf: '1234', expo: -8, price: '12345678' }
-  const priceInWei = latestEthUsdPrice?.price;
-  // Parse the price to a number
-  const priceInEth = utils.formatUnits(priceInWei!, 8);
-  return +priceInEth
-};
