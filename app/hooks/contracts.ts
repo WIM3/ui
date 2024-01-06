@@ -84,7 +84,8 @@ export const useToken = () => {
 
     try {
       const result = await basicTokenWithMint.balanceOf(account);
-      result && setBalance(utils.formatUnits(result));
+      
+      result && setBalance(utils.formatUnits(result, 6));
     } catch (error) {
       console.error(error);
     }
