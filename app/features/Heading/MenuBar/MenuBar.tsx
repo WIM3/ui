@@ -27,13 +27,16 @@ export const MenuBar = () => {
 
   const handleGetEthClick = () => {
     window.open(
-      "https://community.optimism.io/docs/useful-tools/faucets/#testnet-faucets",
+      "https://app.optimism.io/faucet",
       "_blank"
     );
   };
 
   const handleGetUsdcClick = () => {
-    mintToken("100").then(getTokenBalance);
+    window.open(
+      "https://faucet.circle.com/",
+      "_blank"
+    );
   };
 
   return (
