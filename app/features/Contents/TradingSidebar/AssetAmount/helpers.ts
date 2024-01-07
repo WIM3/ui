@@ -28,8 +28,7 @@ export const convertQuoteToBaseAmount = (
 ) => {
   const convertedAmount = new BigNumber(quoteAmount).dividedBy(exchangeRate);
   const maxAmount = balance.dividedBy(exchangeRate);
-
-  return toFixedNumber(BigNumber.min(convertedAmount, maxAmount));
+  return BigNumber.min(convertedAmount, maxAmount).toFixed(0);
 };
 
 export const convertBaseToQuoteAmount = (
