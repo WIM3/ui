@@ -7,6 +7,12 @@ export const TOKENS: { [key in TokenId]: Token } = {
     symbol: "BTC",
     name: "Bitcoin",
   },
+  [TokenId.OP]: {
+    id: TokenId.OP,
+    icon: "/tokens/optimism.svg",
+    symbol: "OP",
+    name: "Optimism",
+  },
   [TokenId.USDC]: {
     id: TokenId.USDC,
     icon: "/tokens/usd-coin-usdc.svg",
