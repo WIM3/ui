@@ -64,7 +64,7 @@ export const Select = ({
             sx: selectBackdropStyle,
           },
           PaperProps: {
-            onClick: (e) => e.stopPropagation(),
+            onClick: (e: any) => e.stopPropagation(),
             sx: selectPaperStyle(maxHeight),
           },
         },
