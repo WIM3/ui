@@ -90,7 +90,7 @@ export const getIsQuoteSet = (state: AppState) => {
 export const isTradingSidebarEnabled = (state: AppState) => {
   return (
     getIsBalanceSet(state) &&
-    getIsQuoteSet(state) &&
+    // getIsQuoteSet(state) &&
     state.connection.active &&
     isMarkPriceValid(state)
   );
