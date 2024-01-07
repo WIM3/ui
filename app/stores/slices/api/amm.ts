@@ -60,7 +60,7 @@ export const createAmmSlice: CustomStateCreator<AmmSlice> = (set, get) => ({
             quoteAssetReserve: "0",
             tradeLimitRatio: "0",
             tradingVolume: "0",
-            underlyingPrice: "0",
+            underlyingPrice: ethUsdPrice.toString(),
           };
 
           set(function setAmmInfo(state: AppState) {
