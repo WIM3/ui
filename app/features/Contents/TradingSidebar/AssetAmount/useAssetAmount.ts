@@ -1,4 +1,6 @@
 import BigNumber from "bignumber.js";
+import { utils } from "ethers";
+
 
 import { getPair } from "@/defi";
 import { useStore } from "@/stores/root";
@@ -23,9 +25,10 @@ export default function useAssetAmount() {
   const { underlyingPrice } = useStore((state) => state.amm);
   const sidebarInputsEnabled = useStore(isSidebarInputsEnabled);
   const exchangeRate = toTokenUnit(underlyingPrice);
-
-  const balance = <BigNumber>balanceValue;
+  let balance = <BigNumber>balanceValue;
+  
   const [baseProduct, quoteProduct] = getPair(pairId).productIds;
+  
   const formattedBalance = `Balance: ${formatNumber(balance, {
     productId: quoteProduct,
   })}`;
@@ -50,14 +53,14 @@ export default function useAssetAmount() {
 
     const baseAmount = toFixedNumber(quoteValue.dividedBy(exchangeRate));
 
-    setAmounts(baseAmount, quote);
+    setAmounts(utils.formatUnits(BigNumber(baseAmount).toFixed(0),18), quote);
   }, [underlyingPrice]);
 
   const handleMaxClick = () => {
     const baseAmount = toFixedNumber(balance.dividedBy(exchangeRate));
     const quoteAmount = toFixedNumber(balance);
 
-    setAmounts(baseAmount, quoteAmount);
+    setAmounts(utils.formatUnits(baseAmount,18), quoteAmount);
   };
 
   const handleBaseAmountChange = ({
@@ -70,7 +73,7 @@ export default function useAssetAmount() {
       exchangeRate
     );
 
-    setAmounts(baseAmount, quoteAmount);
+    setAmounts(utils.formatUnits(baseAmount,18), quoteAmount);
   };
 
   const handleQuoteAmountChange = ({
@@ -82,8 +85,7 @@ export default function useAssetAmount() {
       balance,
       exchangeRate
     );
-
-    setAmounts(baseAmount, quoteAmount);
+    setAmounts(utils.formatUnits(baseAmount,18), quoteAmount);
   };
 
   return {
