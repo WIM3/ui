@@ -19,6 +19,7 @@ export type Token = {
   icon: string;
   symbol: string;
   name: string;
+  address: string;
 };
 
 export enum CommodityId {
