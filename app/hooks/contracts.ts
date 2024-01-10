@@ -1,14 +1,15 @@
-import { BigNumber, providers, utils } from "ethers";
+import { BigNumber, ethers, providers, utils } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 import create from "zustand";
 
 import { getClearingHouseContract, getTokenContract } from "@/defi/contracts";
 import { BasicTokenWithMint, ClearingHouse } from "@/defi/contracts/types";
-import { NetworkId } from "@/defi/types";
+import { NetworkId, TokenId } from "@/defi/types";
 import { useStore } from "@/stores/root";
 
 import { useSnackbar } from "@/components/Organisms/Snackbar/useSnackbar";
 import { getSelectedNetwork } from "@/stores/slices/connection";
+import { getPair, getProduct, getToken } from "@/defi";
 
 interface ContractList {
   basicTokenWithMint?: BasicTokenWithMint;
@@ -132,8 +133,16 @@ export const useClearingHouse = () => {
   const { addCloseEvent, removeCloseEvent } = useStore(
     (state) => state.userPositions
   );
+
+  const { pairId } = useStore(
+    (state) => state.markets
+  );
+
+
   const gasLimit = gasAmount(chainId);
   const network = useStore(getSelectedNetwork);
+  const provider = new providers.Web3Provider(window.ethereum as any);
+  const signer = provider.getSigner();
 
   const openPosition = async (
     amm: string,
@@ -143,33 +152,43 @@ export const useClearingHouse = () => {
     baseAssetAmountLimit: string
   ) => {
     if (!active || !account || !clearingHouse || !basicTokenWithMint) return;
+    
 
     setLoading(true);
     try {
       const amountToSpend = utils.parseUnits(quoteAssetAmount);
 
-      const allowance: BigNumber = await basicTokenWithMint.allowance(
-        account,
-        clearingHouse.address
+      const vaultAddr = await clearingHouse.getVault()
+      // approve spending
+      const approval = await basicTokenWithMint.approve(
+        vaultAddr,
+        amountToSpend,
+        gasLimit
       );
+      await approval.wait();
 
-      // approve spending if necessary first
-      if (allowance.lt(amountToSpend)) {
-        const approval = await basicTokenWithMint.approve(
-          clearingHouse.address,
-          amountToSpend,
-          gasLimit
-        );
-        await approval.wait();
-      }
+      const vaultAbi = require("../defi/contracts/abi/Vault.json")
+      const vault = new ethers.Contract(vaultAddr, vaultAbi, signer)
+
+      await vault.deposit(basicTokenWithMint.address, amountToSpend)
+
+      const pair = getPair(pairId)
+      const tokenId = pair.productIds[0] as TokenId
+      const baseToken = getToken(tokenId)
+
+      // get base token
 
       const result = await clearingHouse.openPosition(
-        amm,
-        side,
-        toDecimalStruct(amountToSpend),
-        toDecimalStruct(utils.parseUnits(leverage.toString())),
-        toDecimalStruct(utils.parseUnits(baseAssetAmountLimit)),
-        gasLimit
+        {
+          baseToken: baseToken.address,
+          isBaseToQuote: false,
+          isExactInput: true,
+          oppositeAmountBound: 0,
+          amount: amountToSpend.mul(leverage),
+          sqrtPriceLimitX96: 0,
+          deadline: ethers.constants.MaxUint256,
+          referralCode: ethers.constants.HashZero,
+        }
       );
       // clear previously initiated close events in order to remove
       // the loading indicator for the new/updated position
@@ -197,14 +216,22 @@ export const useClearingHouse = () => {
 
   const closePosition = async (amm: string, quoteAssetAmountLimit: string) => {
     if (!active || !clearingHouse) return;
-
+    
+    const pair = getPair(pairId)
+    const tokenId = pair.productIds[0] as TokenId
+    const baseToken = getToken(tokenId)
+    
     setLoading(true);
     addCloseEvent(amm);
     try {
       const result = await clearingHouse.closePosition(
-        amm,
-        toDecimalStruct(utils.parseUnits(quoteAssetAmountLimit).abs()),
-        gasLimit
+        {
+          baseToken: baseToken.address,
+          sqrtPriceLimitX96: 0,
+          oppositeAmountBound: 0,
+          deadline: ethers.constants.MaxUint256,
+          referralCode: ethers.constants.HashZero,
+        }
       );
       const confirmed = await result.wait();
       enqueueSnackbar({
