@@ -4,6 +4,7 @@ import { Meta, Story } from "@storybook/react";
 import { Notifications } from "./Notifications";
 
 import { positions } from "@/__mocks__/positionsMock";
+import { getPositions } from "@/v2-integration/getPositions";
 
 export default {
   title: "features/Heading/Notifications",
@@ -17,6 +18,7 @@ const createStore = (empty: boolean) => {
     Crypto: {
       BTCUSDC: "0x0",
       AVAXUSDC: "0xe5639cbb02ec3bd65c77e128b0c7350aeefb2bd1",
+      ETHUSDC: "0x652455f5aA89C726C616383D75E7ed2ABE689FD4",
     },
   };
 
@@ -27,7 +29,9 @@ const createStore = (empty: boolean) => {
     active: true,
   };
   useStore.setState(store);
-  !empty && useStore.getState().userPositions.setPositions(positions);
+  !empty && getPositions().then((positions) => {
+    useStore.getState().userPositions.setPositions(positions);
+  })
 };
 
 const Template: Story = (args) => <Notifications {...args} />;
