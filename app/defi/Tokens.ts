@@ -27,7 +27,7 @@ export const TOKENS: { [key in TokenId]: Token } = {
     icon: "/tokens/eth-mainnet.svg",
     symbol: "ETH",
     name: "Ethereum",
-    address: "0x4200000000000000000000000000000000000006",
+    address: "0x5D571ACfeB273bE53eDc2C55A1D7BCB8E6Cfbc81",
   },
   [TokenId.MATIC]: {
     id: TokenId.MATIC,
