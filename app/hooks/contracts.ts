@@ -153,11 +153,10 @@ export const useClearingHouse = () => {
   ) => {
     if (!active || !account || !clearingHouse || !basicTokenWithMint) return;
     
-
     setLoading(true);
     try {
-      const amountToSpend = utils.parseUnits(quoteAssetAmount);
-
+      const amountToSpend = utils.parseUnits(quoteAssetAmount, 6);
+    
       const vaultAddr = await clearingHouse.getVault()
       // approve spending
       const approval = await basicTokenWithMint.approve(
@@ -170,12 +169,11 @@ export const useClearingHouse = () => {
       const vaultAbi = require("../defi/contracts/abi/Vault.json")
       const vault = new ethers.Contract(vaultAddr, vaultAbi, signer)
 
-      await vault.deposit(basicTokenWithMint.address, amountToSpend)
+      await vault.deposit(basicTokenWithMint.address, amountToSpend, {gasLimit: 5000000})
 
       const pair = getPair(pairId)
       const tokenId = pair.productIds[0] as TokenId
       const baseToken = getToken(tokenId)
-
       // get base token
 
       const result = await clearingHouse.openPosition(
@@ -188,7 +186,7 @@ export const useClearingHouse = () => {
           sqrtPriceLimitX96: 0,
           deadline: ethers.constants.MaxUint256,
           referralCode: ethers.constants.HashZero,
-        }
+        }, {gasLimit: 5000000000}
       );
       // clear previously initiated close events in order to remove
       // the loading indicator for the new/updated position
@@ -214,13 +212,11 @@ export const useClearingHouse = () => {
     }
   };
 
-  const closePosition = async (amm: string, quoteAssetAmountLimit: string) => {
+  const closePosition = async (amm: string, quoteAssetAmountLimit: string, tokenId: string ) => {
     if (!active || !clearingHouse) return;
     
-    const pair = getPair(pairId)
-    const tokenId = pair.productIds[0] as TokenId
-    const baseToken = getToken(tokenId)
-    
+    const baseToken = getToken(tokenId as TokenId)
+
     setLoading(true);
     addCloseEvent(amm);
     try {
