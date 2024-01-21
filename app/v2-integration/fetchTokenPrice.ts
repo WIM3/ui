@@ -3,12 +3,12 @@ import { utils } from "ethers";
 
 export const fetchCurrentEthUsdPriceFromPythNetwork = async (): Promise<number> => { 
   const connection = new EvmPriceServiceConnection(
-    "https://hermes-beta.pyth.network"
+    "https://hermes.pyth.network/"
   ); // See Hermes endpoints section below for other endpoints
   
   const priceIds = [
     // You can find the ids of prices at https://pyth.network/developers/price-feed-ids#pyth-evm-testnet
-    "0xca80ba6dc32e08d06f1aa886011eed1d77c77be9eb761cc10d72b7d0a2fd57a6", // ETH/USD price id in testnet
+    "0xff61491a931112ddf1bd8147cd1b641375f79f5825126d665480874634fd0ace", // ETH/USD price id in testnet
   ];
 
   // `getLatestPriceFeeds` returns a `PriceFeed` for each price id. It contains all information about a price and has
