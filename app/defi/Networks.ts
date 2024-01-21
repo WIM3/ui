@@ -83,14 +83,14 @@ export const NETWORKS: {
     nativeToken: TokenId.FTM,
   },
   [NetworkId.optimismTestnet]: {
-    name: "Optimism Goerli",
+    name: "Optimism Sepolia",
     symbol: "OP",
     rpcUrl: process.env.RPC_URL_420!,
-    infoPageUrl: "https://goerli-optimism.etherscan.io/",
+    infoPageUrl: "https://sepolia-optimism.etherscan.io/",
     infoPage: "Optimism Testnet Scan",
     icon: "/networks/optimism.svg",
     defaultTokenSymbol: "OP",
-    publicRpcUrl: "https://endpoints.omniatech.io/v1/op/goerli/public",
+    publicRpcUrl: "https://endpoints.omniatech.io/v1/op/sepolia/public",
     nativeToken: TokenId.OP,
   }
 };

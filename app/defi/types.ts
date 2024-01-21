@@ -58,7 +58,8 @@ export enum NetworkId {
   avalanche = 43114,
   moonriver = 1285,
   fantom = 250,
-  optimismTestnet = 420,
+  optimismTestnet = 11155420,
+
 }
 
 export type Network = {
