@@ -2,6 +2,8 @@ import { BigNumber, ethers, providers, utils } from "ethers";
 import { useCallback, useEffect, useState } from "react";
 import create from "zustand";
 
+import PythAbi from "@pythnetwork/pyth-sdk-solidity/abis/IPyth.json" assert { type: "json" };
+
 import { getClearingHouseContract, getTokenContract } from "@/defi/contracts";
 import { BasicTokenWithMint, ClearingHouse } from "@/defi/contracts/types";
 import { NetworkId, TokenId } from "@/defi/types";
@@ -10,6 +12,8 @@ import { useStore } from "@/stores/root";
 import { useSnackbar } from "@/components/Organisms/Snackbar/useSnackbar";
 import { getSelectedNetwork } from "@/stores/slices/connection";
 import { getPair, getProduct, getToken } from "@/defi";
+import { getUpdateData } from "@/v2-integration/getPythtUpdateData";
+import { updatePriceFeed } from "@/v2-integration/updatePriceFeed";
 
 interface ContractList {
   basicTokenWithMint?: BasicTokenWithMint;
@@ -152,6 +156,7 @@ export const useClearingHouse = () => {
     baseAssetAmountLimit: string
   ) => {
     if (!active || !account || !clearingHouse || !basicTokenWithMint) return;
+    
     
     setLoading(true);
     try {
