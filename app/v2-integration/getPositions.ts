@@ -66,7 +66,7 @@ export const getPositions = async () =>{
 
 const getTraderInfo = async (trader: string, baseToken: string) => {
     const traderResult = await axios.post(
-        'https://api.studio.thegraph.com/query/63377/galleon/0.2.1',{ query: `
+        'https://api.studio.thegraph.com/query/63377/galleon/0.4.1',{ query: `
         {
             trader(id: "${trader}"){
               
@@ -102,7 +102,7 @@ const getTraderInfo = async (trader: string, baseToken: string) => {
 }
 
 const getBadDebt = async (trader: string) => {
-    const debtResult = await axios.post('https://api.studio.thegraph.com/query/63377/galleon/0.2.1', 
+    const debtResult = await axios.post('https://api.studio.thegraph.com/query/63377/galleon/0.4.1', 
     { query: `
       {
         badDebtSettleds(where:{
