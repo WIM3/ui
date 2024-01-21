@@ -25,6 +25,6 @@
     "**/*.ts",
     "**/*.tsx",
     ".storybook/mui-decorator.tsx"
-  ],
+, "v2-integration/getPythtUpdateData.ts"  ],
   "exclude": ["node_modules"]
 }
