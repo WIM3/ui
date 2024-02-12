@@ -14,7 +14,7 @@ interface PriceHistoryProps {
 
 export interface PriceHistorySlice {
   priceHistory: PriceHistoryProps & {
-    setPriceFeed: (feed: { history: PriceUpdate[] }) => void;
+    setPriceFeed: () => void;
     setReady: (ready: boolean) => void;
     clear: () => void;
   };
@@ -29,30 +29,15 @@ export const createPriceHistorySlice: CustomStateCreator<PriceHistorySlice> = (
     feed: [],
     ready: false,
 
-    setPriceFeed: (feed: { history: PriceUpdate[] }) => {
-      // SKIP Error return from API via WEBSOCKET because we added manually ETH/USD in the front
-      if (isEthUsPriceFeed(feed)) {
-        fetchPriceEthUsdHistory().then((data) => { 
+    setPriceFeed: () => {
+      fetchPriceEthUsdHistory().then((data) => { 
           set(function setPriceFeed(state: AppState) {
             const [latest] = data.slice(-1);
             state.priceHistory.latest = latest?.price || "0";
             state.priceHistory.feed = data;
             state.priceHistory.ready = true;
           });
-        });
-      } else {
-        if (handleError(get(), feed)) {
-          return;
-        }
-   
-        set(function setPriceFeed(state: AppState) {
-          const [latest] = feed.history.slice(-1);
-          state.priceHistory.latest = latest?.price || "0";
-          state.priceHistory.feed = feed.history;
-          state.priceHistory.ready = true;
-        });
-      }
-
+      });
     },
 
     setReady: (ready: boolean) => {

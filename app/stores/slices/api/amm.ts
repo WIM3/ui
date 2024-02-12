@@ -31,7 +31,7 @@ const getDefaultData = () => ({
 
 export interface AmmSlice {
   amm: Amm & {
-    setAmmInfo: (amm: Amm) => void;
+    setAmmInfo: () => void;
     clear: () => void;
   };
 }
@@ -40,11 +40,9 @@ export const createAmmSlice: CustomStateCreator<AmmSlice> = (set, get) => ({
   amm: {
     ...getDefaultData(),
 
-    setAmmInfo: (amm: Amm) => {
-      // SKIP Error return from API via WEBSOCKET because we added manually ETH/USD in the front
-      if (isEthUsPriceFeed(amm)) {
-
-        fetchCurrentEthUsdPriceFromPythNetwork().then((ethUsdPrice: number) => { 
+    setAmmInfo: () => {
+      let amm: Amm;
+      fetchCurrentEthUsdPriceFromPythNetwork().then((ethUsdPrice: number) => { 
           amm = {
             baseAssetReserve: "0",
             dataFeedId: EthUsdPriceId,
@@ -67,20 +65,8 @@ export const createAmmSlice: CustomStateCreator<AmmSlice> = (set, get) => ({
 
             state.amm = { ...state.amm, ...amm };
           });
-        });
-        
-       
-      } else {
-        if (handleError(get(), amm)) {
-          return;
-        }
-
-        set(function setAmmInfo(state: AppState) {
-
-          state.amm = { ...state.amm, ...amm };
-        });
-      }
-
+      });
+      
       
     },
 

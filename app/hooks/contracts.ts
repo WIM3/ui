@@ -24,9 +24,7 @@ interface ContractStore extends ContractList {
   setContracts: (contracts: ContractList) => void;
 }
 
-const toDecimalStruct = (d: BigNumber) => ({
-  d,
-});
+
 
 const handleTxError = (
   err: string,
@@ -147,7 +145,7 @@ export const useClearingHouse = () => {
   const network = useStore(getSelectedNetwork);
   const provider = new providers.Web3Provider(window.ethereum as any);
   const signer = provider.getSigner();
-
+ 
   const openPosition = async (
     amm: string,
     side: number,

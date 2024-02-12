@@ -20,7 +20,7 @@ export const addMiddlewares = (storeCreator: CustomStateCreator<AppState>) => {
 
 export const useStore = create<AppState>()(
   addMiddlewares((...params) => ({
-    ...createConnectionSlice(...params),
+    ...createConnectionSlice(...params), 
     ...createNotificationsSlice(...params),
     ...createTradingSidebarSlice(...params),
     ...createMarketsSlice(...params),

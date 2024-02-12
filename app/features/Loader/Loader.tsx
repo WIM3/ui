@@ -23,3 +23,4 @@ export const Loader = ({ children }: LoaderProps) => {
 
   return <Box sx={containerStyle}>{children}</Box>;
 };
+

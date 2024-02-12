@@ -2,36 +2,21 @@ import { getInitialState, useStore } from "@/stores/root";
 import { Meta, Story } from "@storybook/react";
 
 import { RecentTrades } from "./RecentTrades";
+import { getRecentPositions } from "@/v2-integration/getPositions";
+import { providers } from "ethers";
 
 export default {
   title: "features/Contents/RecentTrades",
   component: RecentTrades,
 } as Meta<typeof RecentTrades>;
-
+const provider = new providers.Web3Provider(window.ethereum as any);
 const createStore = () => {
   const store = getInitialState();
 
-  store.recentPositions.list = [
-    {
-      entryPrice: "82000000000000000000",
-      underlyingPrice: "",
-      leverage: "",
-      timestamp: 1654832745,
-      size: "3453625431243266457",
-      type: "Changing",
-      fundingPayment: "",
-    },
-    {
-      entryPrice: "82000000000000000000",
-      underlyingPrice: "",
-      leverage: "",
-      timestamp: 1654832745,
-      size: "-3453625431243266457",
-      type: "Changing",
-      fundingPayment: "",
-    },
-  ];
-
+  getRecentPositions().then((positions)=> {
+    store.recentPositions.list = positions
+  })
+  
   useStore.setState(store);
 };
 

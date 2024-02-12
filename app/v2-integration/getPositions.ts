@@ -1,4 +1,5 @@
 import { ClearingHouse } from "@/defi/contracts/types";
+import { PositionEvent } from "@/types/api";
 import { formatUsdValue, toTokenUnit } from "@/utils/formatters";
 import axios from "axios";
 import BigNumber from "bignumber.js";
@@ -6,18 +7,18 @@ import { format, secondsToMilliseconds } from "date-fns";
 import { ethers, providers } from "ethers";
 import create from "zustand";
 
-const provider = new providers.Web3Provider(window.ethereum as any);
-const signer = provider.getSigner();
 
 const clearingHouseAbi = require("../defi/contracts/abi/ClearingHouse.json")
-const clearingHouse = new ethers.Contract(process.env.CLEARING_HOUSE!, clearingHouseAbi, signer) as ClearingHouse
+
 const accountBalanceAbi = require("../defi/contracts/abi/AccountBalance.json")
 const vaultAbi = require("../defi/contracts/abi/Vault.json")
 const exchangeAbi = require("../defi/contracts/abi/Exchange.json")
 
-export const getPositions = async () =>{
+export const getPositions = async (provider: providers.Web3Provider) =>{
+    const signer = provider.getSigner()
+    const clearingHouse = new ethers.Contract(process.env.CLEARING_HOUSE!, clearingHouseAbi, signer) as ClearingHouse
     const trader = await signer.getAddress()
-    const baseToken = "0x5D571ACfeB273bE53eDc2C55A1D7BCB8E6Cfbc81"
+    const baseToken = "0x96aB7300B34a288A68a513f056eCab0DcDDfe13f"
     const traderInfo = await getTraderInfo(trader, baseToken)
 
     const abAddr = await clearingHouse.getAccountBalance();
@@ -37,7 +38,7 @@ export const getPositions = async () =>{
 
 
     let position = {
-        amm: "0x652455f5aA89C726C616383D75E7ed2ABE689FD4",
+        amm: "0xCcCCe04382A838f409ba002Dd3F5F44766203515",
         leverage: `${positionSize / freeCollateral}`,
         underlyingPrice: `${markPrice}`,
         margin: `${margin}`,
@@ -64,9 +65,44 @@ export const getPositions = async () =>{
           
 }
 
+export const getRecentPositions = async (): Promise<PositionEvent[]> => {
+    var list: PositionEvent[] = [];
+    const results = await axios.post('https://api.studio.thegraph.com/query/63377/galleon/version/latest', { query: `
+        {
+          positionChangeds{
+            id
+            entryPriceAfter
+            marketPriceAfter
+            timestamp
+            positionSizeAfter            
+          }
+        }
+      `
+    })
+    let positions: any[] = []
+    if(results.data.data.positionChangeds != undefined){
+      positions = results.data.data.positionChangeds
+    }
+    
+    positions.forEach((position: any) => {
+      list.push(
+        {
+          entryPrice: `${position.entryPriceAfter}`,
+          underlyingPrice: `${position.marketPriceAfter}`,
+          leverage: "",
+          timestamp: position.timestamp,
+          size: `${position.positionSizeAfter}`,
+          type: "Changing",
+          fundingPayment: "",
+        }       
+      )      
+    });
+    return list
+}
+
 const getTraderInfo = async (trader: string, baseToken: string) => {
     const traderResult = await axios.post(
-        'https://api.studio.thegraph.com/query/63377/galleon/0.4.1',{ query: `
+        'https://api.studio.thegraph.com/query/63377/galleon/version/latest',{ query: `
         {
             trader(id: "${trader}"){
               
@@ -102,7 +138,7 @@ const getTraderInfo = async (trader: string, baseToken: string) => {
 }
 
 const getBadDebt = async (trader: string) => {
-    const debtResult = await axios.post('https://api.studio.thegraph.com/query/63377/galleon/0.4.1', 
+    const debtResult = await axios.post('https://api.studio.thegraph.com/query/63377/galleon/version/latest', 
     { query: `
       {
         badDebtSettleds(where:{

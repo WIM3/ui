@@ -5,6 +5,7 @@ import { Notifications } from "./Notifications";
 
 import { positions } from "@/__mocks__/positionsMock";
 import { getPositions } from "@/v2-integration/getPositions";
+import { providers } from "ethers";
 
 export default {
   title: "features/Heading/Notifications",
@@ -28,8 +29,9 @@ const createStore = (empty: boolean) => {
     ...store.connection,
     active: true,
   };
+  const provider = new providers.Web3Provider(window.ethereum as any);
   useStore.setState(store);
-  !empty && getPositions().then((positions) => {
+  !empty && getPositions(provider).then((positions) => {
     useStore.getState().userPositions.setPositions(positions);
   })
 };
