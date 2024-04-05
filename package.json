@@ -23,6 +23,7 @@
     "deploy:prod": "vercel --prod"
   },
   "devDependencies": {
+    "@types/bn.js": "^5.1.5",
     "husky": ">=6",
     "vercel": "^28.10.1"
   },
@@ -31,6 +32,7 @@
   },
   "dependencies": {
     "@pythnetwork/pyth-sdk-solidity": "^2.4.0",
-    "axios": "^1.6.5"
+    "axios": "^1.6.5",
+    "bn.js": "^5.2.1"
   }
 }
