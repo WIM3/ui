@@ -80,26 +80,28 @@ export const createPositionGridData = (
   });
 
   return activePositions.map((position) => {
-    const pair = getPair(position.pairId);
+    const pair = getPair(PairId.ETHUSDC);
     const [baseCcy, quoteCcy] = pair.productIds;
     const size = toTokenUnit(position.size);
     const direction = size.lt(0) ? Directions.Short : Directions.Long;
-    const leverage = toTokenUnit(position.leverage);
-    const entryPrice = toTokenUnit(position.entryPrice);
+    const leverage = position.leverage;
+    const entryPrice = new BigNumber(position.entryPrice);
     const openNotional = toTokenUnit(position.openNotional);
-    const markPrice = toTokenUnit(position.underlyingPrice);
+    const markPrice = toTokenUnit(position.underlyingPrice,1);
     const timestamp = secondsToMilliseconds(position.timestamp);
     const baseSize = formatNumber(size.abs(), {
       productId: baseCcy,
     });
     const quoteSize = entryPrice.multipliedBy(size).abs();
+    console.log("quote ",quoteSize.toString())
     const formattedQuoteSize = formatNumber(quoteSize, {
       productId: quoteCcy,
     });
+    console.log("f q: ", formattedQuoteSize)
     const liquidationPrice = formatUsdValue(
       openNotional.multipliedBy(new BigNumber(process.env.LIQ_FEE_RATIO!))
     );
-    const profitAndLoss = toTokenUnit(position.unrealizedPnl);
+    const profitAndLoss = toTokenUnit(position.unrealizedPnl,1);
     const formattedProfitAndLoss = formatNumber(profitAndLoss, {
       productId: quoteCcy,
     });
@@ -116,11 +118,11 @@ export const createPositionGridData = (
       originalDirection: direction,
       directionColor:
         direction === Directions.Long ? "alert.lemon" : "alert.guava",
-      leverage: `${formatNumber(leverage, { base: 1 })}X`,
+      leverage: `${leverage}X`,
       size: `${baseSize} (${formattedQuoteSize})`,
       date: format(timestamp, "dd/MM/yyyy"),
       time: format(timestamp, "HH:mm:ss"),
-      entryPrice: formatUsdValue(entryPrice),
+      entryPrice: formatUsdValue(entryPrice.multipliedBy(100)),
       markPrice: formatUsdValue(markPrice),
       liquidationPrice,
       profitAndLoss: `${formattedProfitAndLoss} (${formattedPnlROE}%)`,

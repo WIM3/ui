@@ -14,6 +14,8 @@ import { getSelectedNetwork } from "@/stores/slices/connection";
 import { getPair, getProduct, getToken } from "@/defi";
 import { getUpdateData } from "@/v2-integration/getPythtUpdateData";
 import { updatePriceFeed } from "@/v2-integration/updatePriceFeed";
+import { parseEther } from "ethers/lib/utils";
+import { toDecimal } from "@/utils/number";
 
 interface ContractList {
   basicTokenWithMint?: BasicTokenWithMint;
@@ -158,39 +160,16 @@ export const useClearingHouse = () => {
     
     setLoading(true);
     try {
-      const amountToSpend = utils.parseUnits(quoteAssetAmount, 6);
-    
-      const vaultAddr = await clearingHouse.getVault()
-      // approve spending
+      
       const approval = await basicTokenWithMint.approve(
-        vaultAddr,
-        amountToSpend,
+        clearingHouse.address,
+        toDecimal(quoteAssetAmount,6).d,
         gasLimit
       );
       await approval.wait();
 
-      const vaultAbi = require("../defi/contracts/abi/Vault.json")
-      const vault = new ethers.Contract(vaultAddr, vaultAbi, signer)
-
-      await vault.deposit(basicTokenWithMint.address, amountToSpend, {gasLimit: 5000000})
-
-      const pair = getPair(pairId)
-      const tokenId = pair.productIds[0] as TokenId
-      const baseToken = getToken(tokenId)
-      // get base token
-
-      const result = await clearingHouse.openPosition(
-        {
-          baseToken: baseToken.address,
-          isBaseToQuote: false,
-          isExactInput: true,
-          oppositeAmountBound: 0,
-          amount: amountToSpend.mul(leverage),
-          sqrtPriceLimitX96: 0,
-          deadline: ethers.constants.MaxUint256,
-          referralCode: ethers.constants.HashZero,
-        }, {gasLimit: 5000000000}
-      );
+      const result = await clearingHouse.openPosition(amm, side, toDecimal(quoteAssetAmount), toDecimal(leverage), toDecimal(baseAssetAmountLimit));      
+     
       // clear previously initiated close events in order to remove
       // the loading indicator for the new/updated position
       removeCloseEvent(amm);
@@ -223,15 +202,7 @@ export const useClearingHouse = () => {
     setLoading(true);
     addCloseEvent(amm);
     try {
-      const result = await clearingHouse.closePosition(
-        {
-          baseToken: baseToken.address,
-          sqrtPriceLimitX96: 0,
-          oppositeAmountBound: 0,
-          deadline: ethers.constants.MaxUint256,
-          referralCode: ethers.constants.HashZero,
-        }
-      );
+      const result = await clearingHouse.closePosition(amm, toDecimal(quoteAssetAmountLimit))
       const confirmed = await result.wait();
       enqueueSnackbar({
         title: "Success",

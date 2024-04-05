@@ -40,8 +40,16 @@ export const formatNumber = (
   const convertedNum = new BigNumber(num);
 
   if (convertedNum.isNaN()) return "";
+  console.log("conv num ", convertedNum.toString())
 
-  const roundedNum = convertedNum.decimalPlaces(base);
+  let roundedNum: BigNumber
+  if(convertedNum.toString().includes('.')){
+    roundedNum = new BigNumber(roundBigNumber(convertedNum, 2))
+  } else{
+    roundedNum = convertedNum.decimalPlaces(base);
+  }
+  
+  console.log("rounded ", roundedNum.toString())
   const product = productId ? getProduct(productId).symbol : null;
   const calculatedSuffix = suffix ? suffix : product ? ` ${product}` : "";
   const calculatedSign = showSign && roundedNum.gt(0) ? "+" : "";
@@ -53,9 +61,17 @@ export const formatNumber = (
       calculatedSuffix
     )
   );
+  console.log("formater ", formattedAmount)
 
   return formattedAmount;
 };
+
+const roundBigNumber = (amount: BigNumber, base: number) => {
+    let amountArr = amount.toString().split('.')
+    let decimal = amountArr[1].slice(0,base)
+    let newAmount = [amountArr[0], decimal].join('.')
+    return newAmount
+}
 
 export const toFixedNumber = (amount: BigNumber | number, base: number = 2) => {
   return formatNumber(amount, { base, withThousandSeparator: false });

@@ -14,48 +14,63 @@ const accountBalanceAbi = require("../defi/contracts/abi/AccountBalance.json")
 const vaultAbi = require("../defi/contracts/abi/Vault.json")
 const exchangeAbi = require("../defi/contracts/abi/Exchange.json")
 
-export const getPositions = async (provider: providers.Web3Provider) =>{
-    const signer = provider.getSigner()
-    const clearingHouse = new ethers.Contract(process.env.CLEARING_HOUSE!, clearingHouseAbi, signer) as ClearingHouse
-    const trader = await signer.getAddress()
-    const baseToken = "0x96aB7300B34a288A68a513f056eCab0DcDDfe13f"
-    const traderInfo = await getTraderInfo(trader, baseToken)
-
-    const abAddr = await clearingHouse.getAccountBalance();
-    const vaultAddr = await clearingHouse.getVault();
-    const exchangeAddr = await clearingHouse.getExchange();
-    const accountBalance = new ethers.Contract(abAddr, accountBalanceAbi, signer)
-    const vault = new ethers.Contract(vaultAddr, vaultAbi, signer)
-    const exchange = new ethers.Contract(exchangeAddr, exchangeAbi, signer)
+export const getPositions = async (trader: string) =>{
+    console.log("trader address", trader)
+    if(trader == undefined){
+      return []
+    }
     
-    const [pnl, unrealizedPnl, fee] = await accountBalance.getPnlAndPendingFee(trader)
-    const margin = await accountBalance.getMarginRequirementForLiquidation(trader)
-    const markPrice = await accountBalance.getMarkPrice(baseToken);
-    const positionSize = await accountBalance.getTakerPositionSize(trader, baseToken)
-    const freeCollateral = await vault.getFreeCollateralByToken(trader, process.env.USDC!)
-    const fundingPayment = await exchange.getPendingFundingPayment(trader, baseToken)
-    const badDebt = await getBadDebt(trader)
-
-
+    const results = await axios.post('https://api.studio.thegraph.com/query/63377/galleonv2/version/latest', { query: `
+      {
+        positionChangeds(where: {trader: "${trader}"}){
+          id
+          txHash
+          trader
+          amm
+          margin
+          positionNotional
+          exchangedPositionSize
+          fee
+          positionSizeAfter
+          realizedPnl
+          unrealizedPnlAfter
+          badDebt
+          liquidationPenalty
+          spotPrice
+          fundingPayment
+          blockNumberLogIndex
+          blockNumber
+          timestamp
+        }
+      }
+    `
+    })
+    let positions: any[] = []
+    console.log("trader  ",results.data)
+    if(results.data.data.positionChangeds != undefined){
+      positions = results.data.data.positionChangeds
+    }
+    let leverage = new BigNumber(positions[0].positionNotional).dividedBy(positions[0].margin)
+    console.log("user leveraga ", leverage.toString())
     let position = {
-        amm: "0xCcCCe04382A838f409ba002Dd3F5F44766203515",
-        leverage: `${positionSize / freeCollateral}`,
-        underlyingPrice: `${markPrice}`,
-        margin: `${margin}`,
-        fee: `${fee}`,
-        trader: `${trader}`,
-        fundingPayment: fundingPayment,
+        amm: positions[0].amm,
+        leverage: leverage.toString(),
+        underlyingPrice: positions[0].spotPrice,
+        margin: positions[0].margin,
+        fee: positions[0].fee,
+        trader: positions[0].trader,
+        fundingPayment: positions[0].fundingPayment,
         active: true,
-        tradingVolume: `${traderInfo.traderMarket[0].tradingVolume}`,
-        entryPrice: `${traderInfo.traderMarket[0].entryPriceAfter}`,
-        badDebt: `${badDebt.amount}`,
-        size: `${positionSize}`,
-        unrealizedPnl: `${unrealizedPnl}`,
-        totalPnlAmount: `${traderInfo.totalPnl}`,
-        openNotional: `${traderInfo.traderMarket[0].openNotional}`,
-        realizedPnl: `${pnl}`,
-        liquidationPenalty: `${traderInfo.traderMarket[0].liquidationFee}`,
-        timestamp: traderInfo.traderMarket[0].timestamp,
+        tradingVolume: positions[0].exchangedPositionSize,
+        entryPrice: positions[0].positionSizeAfter,
+        badDebt: positions[0].badDebt,
+        size: positions[0].positionSizeAfter,
+        unrealizedPnl: positions[0].unrealizedPnlAfter,
+        totalPnlAmount: positions[0].unrealizedPnl,
+        openNotional: positions[0].positionNotional,
+        realizedPnl: positions[0].realizedPnl,
+        liquidationPenalty: positions[0].liquidationPenalty,
+        timestamp: positions[0].timestamp,
     };
     
     return [{
@@ -67,14 +82,28 @@ export const getPositions = async (provider: providers.Web3Provider) =>{
 
 export const getRecentPositions = async (): Promise<PositionEvent[]> => {
     var list: PositionEvent[] = [];
-    const results = await axios.post('https://api.studio.thegraph.com/query/63377/galleon/version/latest', { query: `
+    const results = await axios.post('https://api.studio.thegraph.com/query/63377/galleonv2/version/latest', { query: `
         {
           positionChangeds{
             id
-            entryPriceAfter
-            marketPriceAfter
+            txHash
+            trader
+            amm
+            margin
+            positionNotional
+            exchangedPositionSize
+            fee
+            positionSizeAfter
+            realizedPnl
+            unrealizedPnlAfter
+            badDebt
+            liquidationPenalty
+            spotPrice
+            fundingPayment
+            blockNumberLogIndex
+            blockNumber
             timestamp
-            positionSizeAfter            
+            
           }
         }
       `
@@ -85,69 +114,32 @@ export const getRecentPositions = async (): Promise<PositionEvent[]> => {
     }
     
     positions.forEach((position: any) => {
+      let leverage = new BigNumber(position.positionNotional).dividedBy(position.margin)
+      console.log("leverage ", leverage.toString())
       list.push(
         {
-          entryPrice: `${position.entryPriceAfter}`,
-          underlyingPrice: `${position.marketPriceAfter}`,
-          leverage: "",
+          entryPrice: `${position.positionSizeAfter}`,
+          underlyingPrice: `${position.spotPrice}`,
+          leverage: `${leverage.toString()}`,
           timestamp: position.timestamp,
-          size: `${position.positionSizeAfter}`,
+          size: `${position.exchangedPositionSize}`,
           type: "Changing",
-          fundingPayment: "",
+          fundingPayment: `${position.fundingPayment}`,
         }       
       )      
     });
     return list
 }
 
-const getTraderInfo = async (trader: string, baseToken: string) => {
-    const traderResult = await axios.post(
-        'https://api.studio.thegraph.com/query/63377/galleon/version/latest',{ query: `
-        {
-            trader(id: "${trader}"){
-              
-              traderMarkets(where:{
-                baseToken: "${baseToken}"
-              }){
-                baseToken
-                entryPrice
-                openNotional
-                tradingVolume
-                timestamp
-                liquidationFee
-                marketRef{
-                  id
-                  baseToken
-                  quoteToken
-                  pool
-                  feeRatio
-                  tradingVolume
-                  tradingFee
-                  blockNumberAdded
-                  timestampAdded
-                  blockNumber
-                  timestamp
-                }
-              }
-            }
-          }
-        `
-        }
-    )
-    return traderResult.data.data.trader
+const formatToX6 = (value: string) => {
+    let numberarr = value.split('.')
+    let sliced = numberarr[1].slice(0,6)
+    return [numberarr[0], sliced].join('')
 }
 
-const getBadDebt = async (trader: string) => {
-    const debtResult = await axios.post('https://api.studio.thegraph.com/query/63377/galleon/version/latest', 
-    { query: `
-      {
-        badDebtSettleds(where:{
-          trader: "${trader}"
-        }){
-          amount
-        }
-      }
-    `
-    }) 
-    return debtResult.data.data.badDebtSettleds[0]
+const removeDot = (value: string) => {
+    let newValuearr = value.split('.')
+    let newValue = newValuearr.join('')
+    return newValue
 }
+

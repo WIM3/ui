@@ -20,14 +20,14 @@ export const TOKENS: { [key in TokenId]: Token } = {
     icon: "/tokens/usd-coin-usdc.svg",
     symbol: "USDC",
     name: "USDC",
-    address: "0xe05606174bac4A6364B31bd0eCA4bf4dD368f8C6",
+    address: "0x803F888AC910e24aaFAF341F794E22F9A556Ea12",
   },
   [TokenId.ETH]: {
     id: TokenId.ETH,
     icon: "/tokens/eth-mainnet.svg",
     symbol: "ETH",
     name: "Ethereum",
-    address: "0x5D571ACfeB273bE53eDc2C55A1D7BCB8E6Cfbc81",
+    address: "0x520e974AEC24CEE829e9b3C5C6cd6f55cCa4F8a6",
   },
   [TokenId.MATIC]: {
     id: TokenId.MATIC,

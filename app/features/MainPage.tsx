@@ -22,6 +22,7 @@ export const MainPage = () => {
   useAmmInfo();
   useRecentPositions();
   usePriceFeed();
+  
   useUserPositions();
 
   return (
@@ -31,3 +32,4 @@ export const MainPage = () => {
     </Loader>
   );
 };
+

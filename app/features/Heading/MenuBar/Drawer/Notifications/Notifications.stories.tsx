@@ -29,11 +29,15 @@ const createStore = (empty: boolean) => {
     ...store.connection,
     active: true,
   };
+  
   const provider = new providers.Web3Provider(window.ethereum as any);
-  useStore.setState(store);
-  !empty && getPositions(provider).then((positions) => {
-    useStore.getState().userPositions.setPositions(positions);
+  const trader = provider.getSigner().getAddress().then((addr) => {
+    useStore.setState(store);
+    !empty && getPositions(addr).then((positions) => {
+      useStore.getState().userPositions.setPositions(positions);
+    })
   })
+  
 };
 
 const Template: Story = (args) => <Notifications {...args} />;

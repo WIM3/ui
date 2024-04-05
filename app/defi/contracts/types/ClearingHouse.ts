@@ -24,192 +24,83 @@ import type {
   TypedEvent,
   TypedListener,
   OnEvent,
-  PromiseOrValue,
 } from "./common";
 
-export declare namespace IClearingHouse {
-  export type AddLiquidityParamsStruct = {
-    baseToken: PromiseOrValue<string>;
-    base: PromiseOrValue<BigNumberish>;
-    quote: PromiseOrValue<BigNumberish>;
-    lowerTick: PromiseOrValue<BigNumberish>;
-    upperTick: PromiseOrValue<BigNumberish>;
-    minBase: PromiseOrValue<BigNumberish>;
-    minQuote: PromiseOrValue<BigNumberish>;
-    useTakerBalance: PromiseOrValue<boolean>;
-    deadline: PromiseOrValue<BigNumberish>;
+export declare namespace Decimal {
+  export type DecimalStruct = { d: BigNumberish };
+
+  export type DecimalStructOutput = [BigNumber] & { d: BigNumber };
+}
+
+export declare namespace SignedDecimal {
+  export type SignedDecimalStruct = { d: BigNumberish };
+
+  export type SignedDecimalStructOutput = [BigNumber] & { d: BigNumber };
+}
+
+export declare namespace ClearingHouse {
+  export type PositionStruct = {
+    size: SignedDecimal.SignedDecimalStruct;
+    margin: Decimal.DecimalStruct;
+    openNotional: Decimal.DecimalStruct;
+    lastUpdatedCumulativePremiumFraction: SignedDecimal.SignedDecimalStruct;
+    liquidityHistoryIndex: BigNumberish;
+    blockNumber: BigNumberish;
   };
 
-  export type AddLiquidityParamsStructOutput = [
-    string,
-    BigNumber,
-    BigNumber,
-    number,
-    number,
-    BigNumber,
-    BigNumber,
-    boolean,
-    BigNumber
-  ] & {
-    baseToken: string;
-    base: BigNumber;
-    quote: BigNumber;
-    lowerTick: number;
-    upperTick: number;
-    minBase: BigNumber;
-    minQuote: BigNumber;
-    useTakerBalance: boolean;
-    deadline: BigNumber;
-  };
-
-  export type AddLiquidityResponseStruct = {
-    base: PromiseOrValue<BigNumberish>;
-    quote: PromiseOrValue<BigNumberish>;
-    fee: PromiseOrValue<BigNumberish>;
-    liquidity: PromiseOrValue<BigNumberish>;
-  };
-
-  export type AddLiquidityResponseStructOutput = [
-    BigNumber,
-    BigNumber,
+  export type PositionStructOutput = [
+    SignedDecimal.SignedDecimalStructOutput,
+    Decimal.DecimalStructOutput,
+    Decimal.DecimalStructOutput,
+    SignedDecimal.SignedDecimalStructOutput,
     BigNumber,
     BigNumber
   ] & {
-    base: BigNumber;
-    quote: BigNumber;
-    fee: BigNumber;
-    liquidity: BigNumber;
+    size: SignedDecimal.SignedDecimalStructOutput;
+    margin: Decimal.DecimalStructOutput;
+    openNotional: Decimal.DecimalStructOutput;
+    lastUpdatedCumulativePremiumFraction: SignedDecimal.SignedDecimalStructOutput;
+    liquidityHistoryIndex: BigNumber;
+    blockNumber: BigNumber;
   };
-
-  export type ClosePositionParamsStruct = {
-    baseToken: PromiseOrValue<string>;
-    sqrtPriceLimitX96: PromiseOrValue<BigNumberish>;
-    oppositeAmountBound: PromiseOrValue<BigNumberish>;
-    deadline: PromiseOrValue<BigNumberish>;
-    referralCode: PromiseOrValue<BytesLike>;
-  };
-
-  export type ClosePositionParamsStructOutput = [
-    string,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    string
-  ] & {
-    baseToken: string;
-    sqrtPriceLimitX96: BigNumber;
-    oppositeAmountBound: BigNumber;
-    deadline: BigNumber;
-    referralCode: string;
-  };
-
-  export type OpenPositionParamsStruct = {
-    baseToken: PromiseOrValue<string>;
-    isBaseToQuote: PromiseOrValue<boolean>;
-    isExactInput: PromiseOrValue<boolean>;
-    amount: PromiseOrValue<BigNumberish>;
-    oppositeAmountBound: PromiseOrValue<BigNumberish>;
-    deadline: PromiseOrValue<BigNumberish>;
-    sqrtPriceLimitX96: PromiseOrValue<BigNumberish>;
-    referralCode: PromiseOrValue<BytesLike>;
-  };
-
-  export type OpenPositionParamsStructOutput = [
-    string,
-    boolean,
-    boolean,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    string
-  ] & {
-    baseToken: string;
-    isBaseToQuote: boolean;
-    isExactInput: boolean;
-    amount: BigNumber;
-    oppositeAmountBound: BigNumber;
-    deadline: BigNumber;
-    sqrtPriceLimitX96: BigNumber;
-    referralCode: string;
-  };
-
-  export type RemoveLiquidityParamsStruct = {
-    baseToken: PromiseOrValue<string>;
-    lowerTick: PromiseOrValue<BigNumberish>;
-    upperTick: PromiseOrValue<BigNumberish>;
-    liquidity: PromiseOrValue<BigNumberish>;
-    minBase: PromiseOrValue<BigNumberish>;
-    minQuote: PromiseOrValue<BigNumberish>;
-    deadline: PromiseOrValue<BigNumberish>;
-  };
-
-  export type RemoveLiquidityParamsStructOutput = [
-    string,
-    number,
-    number,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber
-  ] & {
-    baseToken: string;
-    lowerTick: number;
-    upperTick: number;
-    liquidity: BigNumber;
-    minBase: BigNumber;
-    minQuote: BigNumber;
-    deadline: BigNumber;
-  };
-
-  export type RemoveLiquidityResponseStruct = {
-    base: PromiseOrValue<BigNumberish>;
-    quote: PromiseOrValue<BigNumberish>;
-    fee: PromiseOrValue<BigNumberish>;
-  };
-
-  export type RemoveLiquidityResponseStructOutput = [
-    BigNumber,
-    BigNumber,
-    BigNumber
-  ] & { base: BigNumber; quote: BigNumber; fee: BigNumber };
 }
 
 export interface ClearingHouseInterface extends utils.Interface {
   functions: {
-    "addLiquidity((address,uint256,uint256,int24,int24,uint256,uint256,bool,uint256))": FunctionFragment;
-    "cancelAllExcessOrders(address,address)": FunctionFragment;
-    "cancelExcessOrders(address,address,bytes32[])": FunctionFragment;
+    "addMargin(address,(uint256))": FunctionFragment;
+    "backstopLiquidityProviderMap(address)": FunctionFragment;
     "candidate()": FunctionFragment;
-    "closePosition((address,uint160,uint256,uint256,bytes32))": FunctionFragment;
-    "getAccountBalance()": FunctionFragment;
-    "getAccountValue(address)": FunctionFragment;
-    "getClearingHouseConfig()": FunctionFragment;
-    "getDelegateApproval()": FunctionFragment;
-    "getExchange()": FunctionFragment;
-    "getInsuranceFund()": FunctionFragment;
-    "getOrderBook()": FunctionFragment;
-    "getQuoteToken()": FunctionFragment;
-    "getTrustedForwarder()": FunctionFragment;
-    "getUniswapV3Factory()": FunctionFragment;
-    "getVault()": FunctionFragment;
-    "initialize(address,address,address,address,address,address,address)": FunctionFragment;
-    "isTrustedForwarder(address)": FunctionFragment;
-    "liquidate(address,address,int256)": FunctionFragment;
+    "closePosition(address,(uint256))": FunctionFragment;
+    "feePool()": FunctionFragment;
+    "getLatestCumulativePremiumFraction(address)": FunctionFragment;
+    "getMarginRatio(address,address)": FunctionFragment;
+    "getPosition(address,address)": FunctionFragment;
+    "getPositionNotionalAndUnrealizedPnl(address,address,uint8)": FunctionFragment;
+    "getUnadjustedPosition(address,address)": FunctionFragment;
+    "initMarginRatio()": FunctionFragment;
+    "initialize(uint256,address)": FunctionFragment;
+    "insuranceFund()": FunctionFragment;
     "liquidate(address,address)": FunctionFragment;
-    "openPosition((address,bool,bool,uint256,uint256,uint256,uint160,bytes32))": FunctionFragment;
-    "openPositionFor(address,(address,bool,bool,uint256,uint256,uint256,uint160,bytes32))": FunctionFragment;
+    "liquidateWithSlippage(address,address,(uint256))": FunctionFragment;
+    "liquidationFeeRatio()": FunctionFragment;
+    "maintenanceMarginRatio()": FunctionFragment;
+    "openInterestNotionalMap(address)": FunctionFragment;
+    "openPosition(address,uint8,(uint256),(uint256),(uint256))": FunctionFragment;
     "owner()": FunctionFragment;
+    "partialLiquidationRatio()": FunctionFragment;
     "pause()": FunctionFragment;
     "paused()": FunctionFragment;
-    "quitMarket(address,address)": FunctionFragment;
-    "removeLiquidity((address,int24,int24,uint128,uint256,uint256,uint256))": FunctionFragment;
+    "payFunding(address)": FunctionFragment;
+    "removeMargin(address,(uint256))": FunctionFragment;
     "renounceOwnership()": FunctionFragment;
-    "setDelegateApproval(address)": FunctionFragment;
+    "setBackstopLiquidityProvider(address,bool)": FunctionFragment;
+    "setFeePool(address)": FunctionFragment;
+    "setLiquidationFeeRatio((uint256))": FunctionFragment;
+    "setMaintenanceMarginRatio((uint256))": FunctionFragment;
     "setOwner(address)": FunctionFragment;
-    "settleAllFunding(address)": FunctionFragment;
-    "uniswapV3MintCallback(uint256,uint256,bytes)": FunctionFragment;
-    "uniswapV3SwapCallback(int256,int256,bytes)": FunctionFragment;
+    "setPartialLiquidationRatio((uint256))": FunctionFragment;
+    "setWhitelist(address)": FunctionFragment;
+    "settlePosition(address)": FunctionFragment;
     "unpause()": FunctionFragment;
     "updateOwner()": FunctionFragment;
     "versionRecipient()": FunctionFragment;
@@ -217,184 +108,162 @@ export interface ClearingHouseInterface extends utils.Interface {
 
   getFunction(
     nameOrSignatureOrTopic:
-      | "addLiquidity"
-      | "cancelAllExcessOrders"
-      | "cancelExcessOrders"
+      | "addMargin"
+      | "backstopLiquidityProviderMap"
       | "candidate"
       | "closePosition"
-      | "getAccountBalance"
-      | "getAccountValue"
-      | "getClearingHouseConfig"
-      | "getDelegateApproval"
-      | "getExchange"
-      | "getInsuranceFund"
-      | "getOrderBook"
-      | "getQuoteToken"
-      | "getTrustedForwarder"
-      | "getUniswapV3Factory"
-      | "getVault"
+      | "feePool"
+      | "getLatestCumulativePremiumFraction"
+      | "getMarginRatio"
+      | "getPosition"
+      | "getPositionNotionalAndUnrealizedPnl"
+      | "getUnadjustedPosition"
+      | "initMarginRatio"
       | "initialize"
-      | "isTrustedForwarder"
-      | "liquidate(address,address,int256)"
-      | "liquidate(address,address)"
+      | "insuranceFund"
+      | "liquidate"
+      | "liquidateWithSlippage"
+      | "liquidationFeeRatio"
+      | "maintenanceMarginRatio"
+      | "openInterestNotionalMap"
       | "openPosition"
-      | "openPositionFor"
       | "owner"
+      | "partialLiquidationRatio"
       | "pause"
       | "paused"
-      | "quitMarket"
-      | "removeLiquidity"
+      | "payFunding"
+      | "removeMargin"
       | "renounceOwnership"
-      | "setDelegateApproval"
+      | "setBackstopLiquidityProvider"
+      | "setFeePool"
+      | "setLiquidationFeeRatio"
+      | "setMaintenanceMarginRatio"
       | "setOwner"
-      | "settleAllFunding"
-      | "uniswapV3MintCallback"
-      | "uniswapV3SwapCallback"
+      | "setPartialLiquidationRatio"
+      | "setWhitelist"
+      | "settlePosition"
       | "unpause"
       | "updateOwner"
       | "versionRecipient"
   ): FunctionFragment;
 
   encodeFunctionData(
-    functionFragment: "addLiquidity",
-    values: [IClearingHouse.AddLiquidityParamsStruct]
+    functionFragment: "addMargin",
+    values: [string, Decimal.DecimalStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "cancelAllExcessOrders",
-    values: [PromiseOrValue<string>, PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "cancelExcessOrders",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BytesLike>[]
-    ]
+    functionFragment: "backstopLiquidityProviderMap",
+    values: [string]
   ): string;
   encodeFunctionData(functionFragment: "candidate", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "closePosition",
-    values: [IClearingHouse.ClosePositionParamsStruct]
+    values: [string, Decimal.DecimalStruct]
+  ): string;
+  encodeFunctionData(functionFragment: "feePool", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "getLatestCumulativePremiumFraction",
+    values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "getAccountBalance",
+    functionFragment: "getMarginRatio",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPosition",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getPositionNotionalAndUnrealizedPnl",
+    values: [string, string, BigNumberish]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getUnadjustedPosition",
+    values: [string, string]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "initMarginRatio",
     values?: undefined
   ): string;
-  encodeFunctionData(
-    functionFragment: "getAccountValue",
-    values: [PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getClearingHouseConfig",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getDelegateApproval",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getExchange",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getInsuranceFund",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getOrderBook",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getQuoteToken",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getTrustedForwarder",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getUniswapV3Factory",
-    values?: undefined
-  ): string;
-  encodeFunctionData(functionFragment: "getVault", values?: undefined): string;
   encodeFunctionData(
     functionFragment: "initialize",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<string>
-    ]
+    values: [BigNumberish, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "isTrustedForwarder",
-    values: [PromiseOrValue<string>]
+    functionFragment: "insuranceFund",
+    values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "liquidate(address,address,int256)",
-    values: [
-      PromiseOrValue<string>,
-      PromiseOrValue<string>,
-      PromiseOrValue<BigNumberish>
-    ]
+    functionFragment: "liquidate",
+    values: [string, string]
   ): string;
   encodeFunctionData(
-    functionFragment: "liquidate(address,address)",
-    values: [PromiseOrValue<string>, PromiseOrValue<string>]
+    functionFragment: "liquidateWithSlippage",
+    values: [string, string, Decimal.DecimalStruct]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "liquidationFeeRatio",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "maintenanceMarginRatio",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "openInterestNotionalMap",
+    values: [string]
   ): string;
   encodeFunctionData(
     functionFragment: "openPosition",
-    values: [IClearingHouse.OpenPositionParamsStruct]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "openPositionFor",
-    values: [PromiseOrValue<string>, IClearingHouse.OpenPositionParamsStruct]
+    values: [
+      string,
+      BigNumberish,
+      Decimal.DecimalStruct,
+      Decimal.DecimalStruct,
+      Decimal.DecimalStruct
+    ]
   ): string;
   encodeFunctionData(functionFragment: "owner", values?: undefined): string;
+  encodeFunctionData(
+    functionFragment: "partialLiquidationRatio",
+    values?: undefined
+  ): string;
   encodeFunctionData(functionFragment: "pause", values?: undefined): string;
   encodeFunctionData(functionFragment: "paused", values?: undefined): string;
+  encodeFunctionData(functionFragment: "payFunding", values: [string]): string;
   encodeFunctionData(
-    functionFragment: "quitMarket",
-    values: [PromiseOrValue<string>, PromiseOrValue<string>]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "removeLiquidity",
-    values: [IClearingHouse.RemoveLiquidityParamsStruct]
+    functionFragment: "removeMargin",
+    values: [string, Decimal.DecimalStruct]
   ): string;
   encodeFunctionData(
     functionFragment: "renounceOwnership",
     values?: undefined
   ): string;
   encodeFunctionData(
-    functionFragment: "setDelegateApproval",
-    values: [PromiseOrValue<string>]
+    functionFragment: "setBackstopLiquidityProvider",
+    values: [string, boolean]
+  ): string;
+  encodeFunctionData(functionFragment: "setFeePool", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "setLiquidationFeeRatio",
+    values: [Decimal.DecimalStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "setOwner",
-    values: [PromiseOrValue<string>]
+    functionFragment: "setMaintenanceMarginRatio",
+    values: [Decimal.DecimalStruct]
+  ): string;
+  encodeFunctionData(functionFragment: "setOwner", values: [string]): string;
+  encodeFunctionData(
+    functionFragment: "setPartialLiquidationRatio",
+    values: [Decimal.DecimalStruct]
   ): string;
   encodeFunctionData(
-    functionFragment: "settleAllFunding",
-    values: [PromiseOrValue<string>]
+    functionFragment: "setWhitelist",
+    values: [string]
   ): string;
   encodeFunctionData(
-    functionFragment: "uniswapV3MintCallback",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "uniswapV3SwapCallback",
-    values: [
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BigNumberish>,
-      PromiseOrValue<BytesLike>
-    ]
+    functionFragment: "settlePosition",
+    values: [string]
   ): string;
   encodeFunctionData(functionFragment: "unpause", values?: undefined): string;
   encodeFunctionData(
@@ -406,16 +275,9 @@ export interface ClearingHouseInterface extends utils.Interface {
     values?: undefined
   ): string;
 
+  decodeFunctionResult(functionFragment: "addMargin", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "addLiquidity",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "cancelAllExcessOrders",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "cancelExcessOrders",
+    functionFragment: "backstopLiquidityProviderMap",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "candidate", data: BytesLike): Result;
@@ -423,74 +285,67 @@ export interface ClearingHouseInterface extends utils.Interface {
     functionFragment: "closePosition",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "feePool", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "getAccountBalance",
+    functionFragment: "getLatestCumulativePremiumFraction",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getAccountValue",
+    functionFragment: "getMarginRatio",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getClearingHouseConfig",
+    functionFragment: "getPosition",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getDelegateApproval",
+    functionFragment: "getPositionNotionalAndUnrealizedPnl",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getExchange",
+    functionFragment: "getUnadjustedPosition",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getInsuranceFund",
+    functionFragment: "initMarginRatio",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(
-    functionFragment: "getOrderBook",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getQuoteToken",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getTrustedForwarder",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getUniswapV3Factory",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "getVault", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "initialize", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "isTrustedForwarder",
+    functionFragment: "insuranceFund",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "liquidate", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "liquidateWithSlippage",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "liquidate(address,address,int256)",
+    functionFragment: "liquidationFeeRatio",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "liquidate(address,address)",
+    functionFragment: "maintenanceMarginRatio",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "openInterestNotionalMap",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
     functionFragment: "openPosition",
     data: BytesLike
   ): Result;
+  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "openPositionFor",
+    functionFragment: "partialLiquidationRatio",
     data: BytesLike
   ): Result;
-  decodeFunctionResult(functionFragment: "owner", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "pause", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "paused", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "quitMarket", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: "payFunding", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "removeLiquidity",
+    functionFragment: "removeMargin",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -498,20 +353,29 @@ export interface ClearingHouseInterface extends utils.Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "setDelegateApproval",
+    functionFragment: "setBackstopLiquidityProvider",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(functionFragment: "setFeePool", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "setLiquidationFeeRatio",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "setMaintenanceMarginRatio",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "setOwner", data: BytesLike): Result;
   decodeFunctionResult(
-    functionFragment: "settleAllFunding",
+    functionFragment: "setPartialLiquidationRatio",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "uniswapV3MintCallback",
+    functionFragment: "setWhitelist",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "uniswapV3SwapCallback",
+    functionFragment: "settlePosition",
     data: BytesLike
   ): Result;
   decodeFunctionResult(functionFragment: "unpause", data: BytesLike): Result;
@@ -525,86 +389,110 @@ export interface ClearingHouseInterface extends utils.Interface {
   ): Result;
 
   events: {
-    "DelegateApprovalChanged(address)": EventFragment;
-    "FundingPaymentSettled(address,address,int256)": EventFragment;
-    "LiquidityChanged(address,address,address,int24,int24,int256,int256,int128,uint256)": EventFragment;
+    "BackstopLiquidityProviderChanged(address,bool)": EventFragment;
+    "InitMarginRatioChanged(uint256)": EventFragment;
+    "InsuranceFundChanged(address)": EventFragment;
+    "LiquidationFeeRatioChanged(uint256)": EventFragment;
+    "MarginChanged(address,address,int256,int256)": EventFragment;
+    "MarginRatioChanged(uint256)": EventFragment;
     "OwnershipTransferred(address,address)": EventFragment;
     "Paused(address)": EventFragment;
-    "PositionChanged(address,address,int256,int256,uint256,int256,int256,uint256)": EventFragment;
-    "PositionClosed(address,address,int256,int256,int256,int256,uint256)": EventFragment;
-    "PositionLiquidated(address,address,uint256,uint256,uint256,address)": EventFragment;
+    "PositionAdjusted(address,address,int256,uint256,uint256)": EventFragment;
+    "PositionChanged(address,address,uint256,uint256,int256,uint256,int256,int256,int256,uint256,uint256,uint256,int256)": EventFragment;
+    "PositionLiquidated(address,address,uint256,uint256,uint256,address,uint256)": EventFragment;
+    "PositionSettled(address,address,uint256)": EventFragment;
     "ReferredPositionChanged(bytes32)": EventFragment;
-    "TrustedForwarderChanged(address)": EventFragment;
-    "TrustedForwarderUpdated(address)": EventFragment;
+    "RestrictionModeEntered(address,uint256)": EventFragment;
     "Unpaused(address)": EventFragment;
   };
 
-  getEvent(nameOrSignatureOrTopic: "DelegateApprovalChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "FundingPaymentSettled"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "LiquidityChanged"): EventFragment;
+  getEvent(
+    nameOrSignatureOrTopic: "BackstopLiquidityProviderChanged"
+  ): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "InitMarginRatioChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "InsuranceFundChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "LiquidationFeeRatioChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MarginChanged"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "MarginRatioChanged"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "OwnershipTransferred"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Paused"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PositionAdjusted"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PositionChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "PositionClosed"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "PositionLiquidated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "PositionSettled"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "ReferredPositionChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TrustedForwarderChanged"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "TrustedForwarderUpdated"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: "RestrictionModeEntered"): EventFragment;
   getEvent(nameOrSignatureOrTopic: "Unpaused"): EventFragment;
 }
 
-export interface DelegateApprovalChangedEventObject {
-  delegateApproval: string;
+export interface BackstopLiquidityProviderChangedEventObject {
+  account: string;
+  isProvider: boolean;
 }
-export type DelegateApprovalChangedEvent = TypedEvent<
-  [string],
-  DelegateApprovalChangedEventObject
+export type BackstopLiquidityProviderChangedEvent = TypedEvent<
+  [string, boolean],
+  BackstopLiquidityProviderChangedEventObject
 >;
 
-export type DelegateApprovalChangedEventFilter =
-  TypedEventFilter<DelegateApprovalChangedEvent>;
+export type BackstopLiquidityProviderChangedEventFilter =
+  TypedEventFilter<BackstopLiquidityProviderChangedEvent>;
 
-export interface FundingPaymentSettledEventObject {
-  trader: string;
-  baseToken: string;
+export interface InitMarginRatioChangedEventObject {
+  initMarginRatio: BigNumber;
+}
+export type InitMarginRatioChangedEvent = TypedEvent<
+  [BigNumber],
+  InitMarginRatioChangedEventObject
+>;
+
+export type InitMarginRatioChangedEventFilter =
+  TypedEventFilter<InitMarginRatioChangedEvent>;
+
+export interface InsuranceFundChangedEventObject {
+  insuranceFund: string;
+}
+export type InsuranceFundChangedEvent = TypedEvent<
+  [string],
+  InsuranceFundChangedEventObject
+>;
+
+export type InsuranceFundChangedEventFilter =
+  TypedEventFilter<InsuranceFundChangedEvent>;
+
+export interface LiquidationFeeRatioChangedEventObject {
+  liquidationFeeRatio: BigNumber;
+}
+export type LiquidationFeeRatioChangedEvent = TypedEvent<
+  [BigNumber],
+  LiquidationFeeRatioChangedEventObject
+>;
+
+export type LiquidationFeeRatioChangedEventFilter =
+  TypedEventFilter<LiquidationFeeRatioChangedEvent>;
+
+export interface MarginChangedEventObject {
+  sender: string;
+  amm: string;
+  amount: BigNumber;
   fundingPayment: BigNumber;
 }
-export type FundingPaymentSettledEvent = TypedEvent<
-  [string, string, BigNumber],
-  FundingPaymentSettledEventObject
+export type MarginChangedEvent = TypedEvent<
+  [string, string, BigNumber, BigNumber],
+  MarginChangedEventObject
 >;
 
-export type FundingPaymentSettledEventFilter =
-  TypedEventFilter<FundingPaymentSettledEvent>;
+export type MarginChangedEventFilter = TypedEventFilter<MarginChangedEvent>;
 
-export interface LiquidityChangedEventObject {
-  maker: string;
-  baseToken: string;
-  quoteToken: string;
-  lowerTick: number;
-  upperTick: number;
-  base: BigNumber;
-  quote: BigNumber;
-  liquidity: BigNumber;
-  quoteFee: BigNumber;
+export interface MarginRatioChangedEventObject {
+  marginRatio: BigNumber;
 }
-export type LiquidityChangedEvent = TypedEvent<
-  [
-    string,
-    string,
-    string,
-    number,
-    number,
-    BigNumber,
-    BigNumber,
-    BigNumber,
-    BigNumber
-  ],
-  LiquidityChangedEventObject
+export type MarginRatioChangedEvent = TypedEvent<
+  [BigNumber],
+  MarginRatioChangedEventObject
 >;
 
-export type LiquidityChangedEventFilter =
-  TypedEventFilter<LiquidityChangedEvent>;
+export type MarginRatioChangedEventFilter =
+  TypedEventFilter<MarginRatioChangedEvent>;
 
 export interface OwnershipTransferredEventObject {
   previousOwner: string;
@@ -625,20 +513,45 @@ export type PausedEvent = TypedEvent<[string], PausedEventObject>;
 
 export type PausedEventFilter = TypedEventFilter<PausedEvent>;
 
+export interface PositionAdjustedEventObject {
+  amm: string;
+  trader: string;
+  newPositionSize: BigNumber;
+  oldLiquidityIndex: BigNumber;
+  newLiquidityIndex: BigNumber;
+}
+export type PositionAdjustedEvent = TypedEvent<
+  [string, string, BigNumber, BigNumber, BigNumber],
+  PositionAdjustedEventObject
+>;
+
+export type PositionAdjustedEventFilter =
+  TypedEventFilter<PositionAdjustedEvent>;
+
 export interface PositionChangedEventObject {
   trader: string;
-  baseToken: string;
+  amm: string;
+  margin: BigNumber;
+  positionNotional: BigNumber;
   exchangedPositionSize: BigNumber;
-  exchangedPositionNotional: BigNumber;
   fee: BigNumber;
-  openNotional: BigNumber;
+  positionSizeAfter: BigNumber;
   realizedPnl: BigNumber;
-  sqrtPriceAfterX96: BigNumber;
+  unrealizedPnlAfter: BigNumber;
+  badDebt: BigNumber;
+  liquidationPenalty: BigNumber;
+  spotPrice: BigNumber;
+  fundingPayment: BigNumber;
 }
 export type PositionChangedEvent = TypedEvent<
   [
     string,
     string,
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    BigNumber,
+    BigNumber,
     BigNumber,
     BigNumber,
     BigNumber,
@@ -651,37 +564,34 @@ export type PositionChangedEvent = TypedEvent<
 
 export type PositionChangedEventFilter = TypedEventFilter<PositionChangedEvent>;
 
-export interface PositionClosedEventObject {
-  trader: string;
-  baseToken: string;
-  closedPositionSize: BigNumber;
-  closedPositionNotional: BigNumber;
-  openNotional: BigNumber;
-  realizedPnl: BigNumber;
-  closedPrice: BigNumber;
-}
-export type PositionClosedEvent = TypedEvent<
-  [string, string, BigNumber, BigNumber, BigNumber, BigNumber, BigNumber],
-  PositionClosedEventObject
->;
-
-export type PositionClosedEventFilter = TypedEventFilter<PositionClosedEvent>;
-
 export interface PositionLiquidatedEventObject {
   trader: string;
-  baseToken: string;
+  amm: string;
   positionNotional: BigNumber;
   positionSize: BigNumber;
   liquidationFee: BigNumber;
   liquidator: string;
+  badDebt: BigNumber;
 }
 export type PositionLiquidatedEvent = TypedEvent<
-  [string, string, BigNumber, BigNumber, BigNumber, string],
+  [string, string, BigNumber, BigNumber, BigNumber, string, BigNumber],
   PositionLiquidatedEventObject
 >;
 
 export type PositionLiquidatedEventFilter =
   TypedEventFilter<PositionLiquidatedEvent>;
+
+export interface PositionSettledEventObject {
+  amm: string;
+  trader: string;
+  valueTransferred: BigNumber;
+}
+export type PositionSettledEvent = TypedEvent<
+  [string, string, BigNumber],
+  PositionSettledEventObject
+>;
+
+export type PositionSettledEventFilter = TypedEventFilter<PositionSettledEvent>;
 
 export interface ReferredPositionChangedEventObject {
   referralCode: string;
@@ -694,27 +604,17 @@ export type ReferredPositionChangedEvent = TypedEvent<
 export type ReferredPositionChangedEventFilter =
   TypedEventFilter<ReferredPositionChangedEvent>;
 
-export interface TrustedForwarderChangedEventObject {
-  forwarder: string;
+export interface RestrictionModeEnteredEventObject {
+  amm: string;
+  blockNumber: BigNumber;
 }
-export type TrustedForwarderChangedEvent = TypedEvent<
-  [string],
-  TrustedForwarderChangedEventObject
+export type RestrictionModeEnteredEvent = TypedEvent<
+  [string, BigNumber],
+  RestrictionModeEnteredEventObject
 >;
 
-export type TrustedForwarderChangedEventFilter =
-  TypedEventFilter<TrustedForwarderChangedEvent>;
-
-export interface TrustedForwarderUpdatedEventObject {
-  trustedForwarder: string;
-}
-export type TrustedForwarderUpdatedEvent = TypedEvent<
-  [string],
-  TrustedForwarderUpdatedEventObject
->;
-
-export type TrustedForwarderUpdatedEventFilter =
-  TypedEventFilter<TrustedForwarderUpdatedEvent>;
+export type RestrictionModeEnteredEventFilter =
+  TypedEventFilter<RestrictionModeEnteredEvent>;
 
 export interface UnpausedEventObject {
   account: string;
@@ -724,8 +624,6 @@ export type UnpausedEvent = TypedEvent<[string], UnpausedEventObject>;
 export type UnpausedEventFilter = TypedEventFilter<UnpausedEvent>;
 
 export interface ClearingHouse extends BaseContract {
-  contractName: "ClearingHouse";
-
   connect(signerOrProvider: Signer | Provider | string): this;
   attach(addressOrName: string): this;
   deployed(): Promise<this>;
@@ -752,455 +650,514 @@ export interface ClearingHouse extends BaseContract {
   removeListener: OnEvent<this>;
 
   functions: {
-    addLiquidity(
-      params: IClearingHouse.AddLiquidityParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    addMargin(
+      _amm: string,
+      _addedMargin: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
-    cancelAllExcessOrders(
-      maker: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    cancelExcessOrders(
-      maker: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      orderIds: PromiseOrValue<BytesLike>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+    backstopLiquidityProviderMap(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[boolean]>;
 
     candidate(overrides?: CallOverrides): Promise<[string]>;
 
     closePosition(
-      params: IClearingHouse.ClosePositionParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      _amm: string,
+      _quoteAssetAmountLimit: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
-    getAccountBalance(overrides?: CallOverrides): Promise<[string]>;
+    feePool(overrides?: CallOverrides): Promise<[string]>;
 
-    getAccountValue(
-      trader: PromiseOrValue<string>,
+    getLatestCumulativePremiumFraction(
+      _amm: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    ): Promise<[SignedDecimal.SignedDecimalStructOutput]>;
 
-    getClearingHouseConfig(overrides?: CallOverrides): Promise<[string]>;
+    getMarginRatio(
+      _amm: string,
+      _trader: string,
+      overrides?: CallOverrides
+    ): Promise<[SignedDecimal.SignedDecimalStructOutput]>;
 
-    getDelegateApproval(overrides?: CallOverrides): Promise<[string]>;
+    getPosition(
+      _amm: string,
+      _trader: string,
+      overrides?: CallOverrides
+    ): Promise<[ClearingHouse.PositionStructOutput]>;
 
-    getExchange(overrides?: CallOverrides): Promise<[string]>;
+    getPositionNotionalAndUnrealizedPnl(
+      _amm: string,
+      _trader: string,
+      _pnlCalcOption: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<
+      [Decimal.DecimalStructOutput, SignedDecimal.SignedDecimalStructOutput] & {
+        positionNotional: Decimal.DecimalStructOutput;
+        unrealizedPnl: SignedDecimal.SignedDecimalStructOutput;
+      }
+    >;
 
-    getInsuranceFund(overrides?: CallOverrides): Promise<[string]>;
+    getUnadjustedPosition(
+      _amm: string,
+      _trader: string,
+      overrides?: CallOverrides
+    ): Promise<
+      [ClearingHouse.PositionStructOutput] & {
+        position: ClearingHouse.PositionStructOutput;
+      }
+    >;
 
-    getOrderBook(overrides?: CallOverrides): Promise<[string]>;
-
-    getQuoteToken(overrides?: CallOverrides): Promise<[string]>;
-
-    getTrustedForwarder(overrides?: CallOverrides): Promise<[string]>;
-
-    getUniswapV3Factory(overrides?: CallOverrides): Promise<[string]>;
-
-    getVault(overrides?: CallOverrides): Promise<[string]>;
+    initMarginRatio(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { d: BigNumber }>;
 
     initialize(
-      clearingHouseConfigArg: PromiseOrValue<string>,
-      vaultArg: PromiseOrValue<string>,
-      quoteTokenArg: PromiseOrValue<string>,
-      uniV3FactoryArg: PromiseOrValue<string>,
-      exchangeArg: PromiseOrValue<string>,
-      accountBalanceArg: PromiseOrValue<string>,
-      insuranceFundArg: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      _initMarginRatio: BigNumberish,
+      _insuranceFund: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
-    isTrustedForwarder(
-      forwarder: PromiseOrValue<string>,
+    insuranceFund(overrides?: CallOverrides): Promise<[string]>;
+
+    liquidate(
+      _amm: string,
+      _trader: string,
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
+
+    liquidateWithSlippage(
+      _amm: string,
+      _trader: string,
+      _quoteAssetAmountLimit: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
+
+    liquidationFeeRatio(
       overrides?: CallOverrides
-    ): Promise<[boolean]>;
+    ): Promise<[BigNumber] & { d: BigNumber }>;
 
-    "liquidate(address,address,int256)"(
-      trader: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      positionSize: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+    maintenanceMarginRatio(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { d: BigNumber }>;
 
-    "liquidate(address,address)"(
-      trader: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
+    openInterestNotionalMap(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { d: BigNumber }>;
 
     openPosition(
-      params: IClearingHouse.OpenPositionParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<ContractTransaction>;
-
-    openPositionFor(
-      trader: PromiseOrValue<string>,
-      params: IClearingHouse.OpenPositionParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      _amm: string,
+      _side: BigNumberish,
+      _quoteAssetAmount: Decimal.DecimalStruct,
+      _leverage: Decimal.DecimalStruct,
+      _baseAssetAmountLimit: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
     owner(overrides?: CallOverrides): Promise<[string]>;
 
+    partialLiquidationRatio(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber] & { d: BigNumber }>;
+
     pause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
     paused(overrides?: CallOverrides): Promise<[boolean]>;
 
-    quitMarket(
-      trader: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    payFunding(
+      _amm: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
-    removeLiquidity(
-      params: IClearingHouse.RemoveLiquidityParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    removeMargin(
+      _amm: string,
+      _removedMargin: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
-    setDelegateApproval(
-      delegateApprovalArg: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    setBackstopLiquidityProvider(
+      account: string,
+      isProvider: boolean,
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
+
+    setFeePool(
+      _feePool: string,
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
+
+    setLiquidationFeeRatio(
+      _liquidationFeeRatio: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
+    ): Promise<ContractTransaction>;
+
+    setMaintenanceMarginRatio(
+      _maintenanceMarginRatio: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
     setOwner(
-      newOwner: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      newOwner: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
-    settleAllFunding(
-      trader: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    setPartialLiquidationRatio(
+      _ratio: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
-    uniswapV3MintCallback(
-      amount0Owed: PromiseOrValue<BigNumberish>,
-      amount1Owed: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    setWhitelist(
+      _whitelist: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
-    uniswapV3SwapCallback(
-      amount0Delta: PromiseOrValue<BigNumberish>,
-      amount1Delta: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    settlePosition(
+      _amm: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
     unpause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
     updateOwner(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: string }
     ): Promise<ContractTransaction>;
 
     versionRecipient(overrides?: CallOverrides): Promise<[string]>;
   };
 
-  addLiquidity(
-    params: IClearingHouse.AddLiquidityParamsStruct,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  addMargin(
+    _amm: string,
+    _addedMargin: Decimal.DecimalStruct,
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
-  cancelAllExcessOrders(
-    maker: PromiseOrValue<string>,
-    baseToken: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  cancelExcessOrders(
-    maker: PromiseOrValue<string>,
-    baseToken: PromiseOrValue<string>,
-    orderIds: PromiseOrValue<BytesLike>[],
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
+  backstopLiquidityProviderMap(
+    arg0: string,
+    overrides?: CallOverrides
+  ): Promise<boolean>;
 
   candidate(overrides?: CallOverrides): Promise<string>;
 
   closePosition(
-    params: IClearingHouse.ClosePositionParamsStruct,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+    _amm: string,
+    _quoteAssetAmountLimit: Decimal.DecimalStruct,
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
-  getAccountBalance(overrides?: CallOverrides): Promise<string>;
+  feePool(overrides?: CallOverrides): Promise<string>;
 
-  getAccountValue(
-    trader: PromiseOrValue<string>,
+  getLatestCumulativePremiumFraction(
+    _amm: string,
+    overrides?: CallOverrides
+  ): Promise<SignedDecimal.SignedDecimalStructOutput>;
+
+  getMarginRatio(
+    _amm: string,
+    _trader: string,
+    overrides?: CallOverrides
+  ): Promise<SignedDecimal.SignedDecimalStructOutput>;
+
+  getPosition(
+    _amm: string,
+    _trader: string,
+    overrides?: CallOverrides
+  ): Promise<ClearingHouse.PositionStructOutput>;
+
+  getPositionNotionalAndUnrealizedPnl(
+    _amm: string,
+    _trader: string,
+    _pnlCalcOption: BigNumberish,
+    overrides?: CallOverrides
+  ): Promise<
+    [Decimal.DecimalStructOutput, SignedDecimal.SignedDecimalStructOutput] & {
+      positionNotional: Decimal.DecimalStructOutput;
+      unrealizedPnl: SignedDecimal.SignedDecimalStructOutput;
+    }
+  >;
+
+  getUnadjustedPosition(
+    _amm: string,
+    _trader: string,
+    overrides?: CallOverrides
+  ): Promise<ClearingHouse.PositionStructOutput>;
+
+  initMarginRatio(overrides?: CallOverrides): Promise<BigNumber>;
+
+  initialize(
+    _initMarginRatio: BigNumberish,
+    _insuranceFund: string,
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  insuranceFund(overrides?: CallOverrides): Promise<string>;
+
+  liquidate(
+    _amm: string,
+    _trader: string,
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  liquidateWithSlippage(
+    _amm: string,
+    _trader: string,
+    _quoteAssetAmountLimit: Decimal.DecimalStruct,
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  liquidationFeeRatio(overrides?: CallOverrides): Promise<BigNumber>;
+
+  maintenanceMarginRatio(overrides?: CallOverrides): Promise<BigNumber>;
+
+  openInterestNotionalMap(
+    arg0: string,
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
-  getClearingHouseConfig(overrides?: CallOverrides): Promise<string>;
-
-  getDelegateApproval(overrides?: CallOverrides): Promise<string>;
-
-  getExchange(overrides?: CallOverrides): Promise<string>;
-
-  getInsuranceFund(overrides?: CallOverrides): Promise<string>;
-
-  getOrderBook(overrides?: CallOverrides): Promise<string>;
-
-  getQuoteToken(overrides?: CallOverrides): Promise<string>;
-
-  getTrustedForwarder(overrides?: CallOverrides): Promise<string>;
-
-  getUniswapV3Factory(overrides?: CallOverrides): Promise<string>;
-
-  getVault(overrides?: CallOverrides): Promise<string>;
-
-  initialize(
-    clearingHouseConfigArg: PromiseOrValue<string>,
-    vaultArg: PromiseOrValue<string>,
-    quoteTokenArg: PromiseOrValue<string>,
-    uniV3FactoryArg: PromiseOrValue<string>,
-    exchangeArg: PromiseOrValue<string>,
-    accountBalanceArg: PromiseOrValue<string>,
-    insuranceFundArg: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  isTrustedForwarder(
-    forwarder: PromiseOrValue<string>,
-    overrides?: CallOverrides
-  ): Promise<boolean>;
-
-  "liquidate(address,address,int256)"(
-    trader: PromiseOrValue<string>,
-    baseToken: PromiseOrValue<string>,
-    positionSize: PromiseOrValue<BigNumberish>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  "liquidate(address,address)"(
-    trader: PromiseOrValue<string>,
-    baseToken: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
   openPosition(
-    params: IClearingHouse.OpenPositionParamsStruct,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
-  ): Promise<ContractTransaction>;
-
-  openPositionFor(
-    trader: PromiseOrValue<string>,
-    params: IClearingHouse.OpenPositionParamsStruct,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+    _amm: string,
+    _side: BigNumberish,
+    _quoteAssetAmount: Decimal.DecimalStruct,
+    _leverage: Decimal.DecimalStruct,
+    _baseAssetAmountLimit: Decimal.DecimalStruct,
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
   owner(overrides?: CallOverrides): Promise<string>;
 
+  partialLiquidationRatio(overrides?: CallOverrides): Promise<BigNumber>;
+
   pause(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
   paused(overrides?: CallOverrides): Promise<boolean>;
 
-  quitMarket(
-    trader: PromiseOrValue<string>,
-    baseToken: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  payFunding(
+    _amm: string,
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
-  removeLiquidity(
-    params: IClearingHouse.RemoveLiquidityParamsStruct,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  removeMargin(
+    _amm: string,
+    _removedMargin: Decimal.DecimalStruct,
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
   renounceOwnership(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
-  setDelegateApproval(
-    delegateApprovalArg: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  setBackstopLiquidityProvider(
+    account: string,
+    isProvider: boolean,
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  setFeePool(
+    _feePool: string,
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  setLiquidationFeeRatio(
+    _liquidationFeeRatio: Decimal.DecimalStruct,
+    overrides?: Overrides & { from?: string }
+  ): Promise<ContractTransaction>;
+
+  setMaintenanceMarginRatio(
+    _maintenanceMarginRatio: Decimal.DecimalStruct,
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
   setOwner(
-    newOwner: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+    newOwner: string,
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
-  settleAllFunding(
-    trader: PromiseOrValue<string>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  setPartialLiquidationRatio(
+    _ratio: Decimal.DecimalStruct,
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
-  uniswapV3MintCallback(
-    amount0Owed: PromiseOrValue<BigNumberish>,
-    amount1Owed: PromiseOrValue<BigNumberish>,
-    data: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  setWhitelist(
+    _whitelist: string,
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
-  uniswapV3SwapCallback(
-    amount0Delta: PromiseOrValue<BigNumberish>,
-    amount1Delta: PromiseOrValue<BigNumberish>,
-    data: PromiseOrValue<BytesLike>,
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+  settlePosition(
+    _amm: string,
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
   unpause(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
   updateOwner(
-    overrides?: Overrides & { from?: PromiseOrValue<string> }
+    overrides?: Overrides & { from?: string }
   ): Promise<ContractTransaction>;
 
   versionRecipient(overrides?: CallOverrides): Promise<string>;
 
   callStatic: {
-    addLiquidity(
-      params: IClearingHouse.AddLiquidityParamsStruct,
-      overrides?: CallOverrides
-    ): Promise<IClearingHouse.AddLiquidityResponseStructOutput>;
-
-    cancelAllExcessOrders(
-      maker: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
+    addMargin(
+      _amm: string,
+      _addedMargin: Decimal.DecimalStruct,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    cancelExcessOrders(
-      maker: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      orderIds: PromiseOrValue<BytesLike>[],
+    backstopLiquidityProviderMap(
+      arg0: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<boolean>;
 
     candidate(overrides?: CallOverrides): Promise<string>;
 
     closePosition(
-      params: IClearingHouse.ClosePositionParamsStruct,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber] & { base: BigNumber; quote: BigNumber }>;
-
-    getAccountBalance(overrides?: CallOverrides): Promise<string>;
-
-    getAccountValue(
-      trader: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    getClearingHouseConfig(overrides?: CallOverrides): Promise<string>;
-
-    getDelegateApproval(overrides?: CallOverrides): Promise<string>;
-
-    getExchange(overrides?: CallOverrides): Promise<string>;
-
-    getInsuranceFund(overrides?: CallOverrides): Promise<string>;
-
-    getOrderBook(overrides?: CallOverrides): Promise<string>;
-
-    getQuoteToken(overrides?: CallOverrides): Promise<string>;
-
-    getTrustedForwarder(overrides?: CallOverrides): Promise<string>;
-
-    getUniswapV3Factory(overrides?: CallOverrides): Promise<string>;
-
-    getVault(overrides?: CallOverrides): Promise<string>;
-
-    initialize(
-      clearingHouseConfigArg: PromiseOrValue<string>,
-      vaultArg: PromiseOrValue<string>,
-      quoteTokenArg: PromiseOrValue<string>,
-      uniV3FactoryArg: PromiseOrValue<string>,
-      exchangeArg: PromiseOrValue<string>,
-      accountBalanceArg: PromiseOrValue<string>,
-      insuranceFundArg: PromiseOrValue<string>,
+      _amm: string,
+      _quoteAssetAmountLimit: Decimal.DecimalStruct,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    isTrustedForwarder(
-      forwarder: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<boolean>;
+    feePool(overrides?: CallOverrides): Promise<string>;
 
-    "liquidate(address,address,int256)"(
-      trader: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      positionSize: PromiseOrValue<BigNumberish>,
+    getLatestCumulativePremiumFraction(
+      _amm: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<SignedDecimal.SignedDecimalStructOutput>;
 
-    "liquidate(address,address)"(
-      trader: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
+    getMarginRatio(
+      _amm: string,
+      _trader: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<SignedDecimal.SignedDecimalStructOutput>;
 
-    openPosition(
-      params: IClearingHouse.OpenPositionParamsStruct,
+    getPosition(
+      _amm: string,
+      _trader: string,
       overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber] & { base: BigNumber; quote: BigNumber }>;
+    ): Promise<ClearingHouse.PositionStructOutput>;
 
-    openPositionFor(
-      trader: PromiseOrValue<string>,
-      params: IClearingHouse.OpenPositionParamsStruct,
+    getPositionNotionalAndUnrealizedPnl(
+      _amm: string,
+      _trader: string,
+      _pnlCalcOption: BigNumberish,
       overrides?: CallOverrides
     ): Promise<
-      [BigNumber, BigNumber, BigNumber] & {
-        base: BigNumber;
-        quote: BigNumber;
-        fee: BigNumber;
+      [Decimal.DecimalStructOutput, SignedDecimal.SignedDecimalStructOutput] & {
+        positionNotional: Decimal.DecimalStructOutput;
+        unrealizedPnl: SignedDecimal.SignedDecimalStructOutput;
       }
     >;
 
+    getUnadjustedPosition(
+      _amm: string,
+      _trader: string,
+      overrides?: CallOverrides
+    ): Promise<ClearingHouse.PositionStructOutput>;
+
+    initMarginRatio(overrides?: CallOverrides): Promise<BigNumber>;
+
+    initialize(
+      _initMarginRatio: BigNumberish,
+      _insuranceFund: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    insuranceFund(overrides?: CallOverrides): Promise<string>;
+
+    liquidate(
+      _amm: string,
+      _trader: string,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
+    liquidateWithSlippage(
+      _amm: string,
+      _trader: string,
+      _quoteAssetAmountLimit: Decimal.DecimalStruct,
+      overrides?: CallOverrides
+    ): Promise<
+      [Decimal.DecimalStructOutput, boolean] & {
+        quoteAssetAmount: Decimal.DecimalStructOutput;
+        isPartialClose: boolean;
+      }
+    >;
+
+    liquidationFeeRatio(overrides?: CallOverrides): Promise<BigNumber>;
+
+    maintenanceMarginRatio(overrides?: CallOverrides): Promise<BigNumber>;
+
+    openInterestNotionalMap(
+      arg0: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    openPosition(
+      _amm: string,
+      _side: BigNumberish,
+      _quoteAssetAmount: Decimal.DecimalStruct,
+      _leverage: Decimal.DecimalStruct,
+      _baseAssetAmountLimit: Decimal.DecimalStruct,
+      overrides?: CallOverrides
+    ): Promise<void>;
+
     owner(overrides?: CallOverrides): Promise<string>;
+
+    partialLiquidationRatio(overrides?: CallOverrides): Promise<BigNumber>;
 
     pause(overrides?: CallOverrides): Promise<void>;
 
     paused(overrides?: CallOverrides): Promise<boolean>;
 
-    quitMarket(
-      trader: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber, BigNumber] & { base: BigNumber; quote: BigNumber }>;
+    payFunding(_amm: string, overrides?: CallOverrides): Promise<void>;
 
-    removeLiquidity(
-      params: IClearingHouse.RemoveLiquidityParamsStruct,
+    removeMargin(
+      _amm: string,
+      _removedMargin: Decimal.DecimalStruct,
       overrides?: CallOverrides
-    ): Promise<IClearingHouse.RemoveLiquidityResponseStructOutput>;
+    ): Promise<void>;
 
     renounceOwnership(overrides?: CallOverrides): Promise<void>;
 
-    setDelegateApproval(
-      delegateApprovalArg: PromiseOrValue<string>,
+    setBackstopLiquidityProvider(
+      account: string,
+      isProvider: boolean,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    setOwner(
-      newOwner: PromiseOrValue<string>,
+    setFeePool(_feePool: string, overrides?: CallOverrides): Promise<void>;
+
+    setLiquidationFeeRatio(
+      _liquidationFeeRatio: Decimal.DecimalStruct,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    settleAllFunding(
-      trader: PromiseOrValue<string>,
+    setMaintenanceMarginRatio(
+      _maintenanceMarginRatio: Decimal.DecimalStruct,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    uniswapV3MintCallback(
-      amount0Owed: PromiseOrValue<BigNumberish>,
-      amount1Owed: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
+    setOwner(newOwner: string, overrides?: CallOverrides): Promise<void>;
+
+    setPartialLiquidationRatio(
+      _ratio: Decimal.DecimalStruct,
       overrides?: CallOverrides
     ): Promise<void>;
 
-    uniswapV3SwapCallback(
-      amount0Delta: PromiseOrValue<BigNumberish>,
-      amount1Delta: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    setWhitelist(_whitelist: string, overrides?: CallOverrides): Promise<void>;
+
+    settlePosition(_amm: string, overrides?: CallOverrides): Promise<void>;
 
     unpause(overrides?: CallOverrides): Promise<void>;
 
@@ -1210,452 +1167,495 @@ export interface ClearingHouse extends BaseContract {
   };
 
   filters: {
-    "DelegateApprovalChanged(address)"(
-      delegateApproval?: PromiseOrValue<string> | null
-    ): DelegateApprovalChangedEventFilter;
-    DelegateApprovalChanged(
-      delegateApproval?: PromiseOrValue<string> | null
-    ): DelegateApprovalChangedEventFilter;
+    "BackstopLiquidityProviderChanged(address,bool)"(
+      account?: string | null,
+      isProvider?: boolean | null
+    ): BackstopLiquidityProviderChangedEventFilter;
+    BackstopLiquidityProviderChanged(
+      account?: string | null,
+      isProvider?: boolean | null
+    ): BackstopLiquidityProviderChangedEventFilter;
 
-    "FundingPaymentSettled(address,address,int256)"(
-      trader?: PromiseOrValue<string> | null,
-      baseToken?: PromiseOrValue<string> | null,
-      fundingPayment?: null
-    ): FundingPaymentSettledEventFilter;
-    FundingPaymentSettled(
-      trader?: PromiseOrValue<string> | null,
-      baseToken?: PromiseOrValue<string> | null,
-      fundingPayment?: null
-    ): FundingPaymentSettledEventFilter;
+    "InitMarginRatioChanged(uint256)"(
+      initMarginRatio?: null
+    ): InitMarginRatioChangedEventFilter;
+    InitMarginRatioChanged(
+      initMarginRatio?: null
+    ): InitMarginRatioChangedEventFilter;
 
-    "LiquidityChanged(address,address,address,int24,int24,int256,int256,int128,uint256)"(
-      maker?: PromiseOrValue<string> | null,
-      baseToken?: PromiseOrValue<string> | null,
-      quoteToken?: PromiseOrValue<string> | null,
-      lowerTick?: null,
-      upperTick?: null,
-      base?: null,
-      quote?: null,
-      liquidity?: null,
-      quoteFee?: null
-    ): LiquidityChangedEventFilter;
-    LiquidityChanged(
-      maker?: PromiseOrValue<string> | null,
-      baseToken?: PromiseOrValue<string> | null,
-      quoteToken?: PromiseOrValue<string> | null,
-      lowerTick?: null,
-      upperTick?: null,
-      base?: null,
-      quote?: null,
-      liquidity?: null,
-      quoteFee?: null
-    ): LiquidityChangedEventFilter;
+    "InsuranceFundChanged(address)"(
+      insuranceFund?: null
+    ): InsuranceFundChangedEventFilter;
+    InsuranceFundChanged(insuranceFund?: null): InsuranceFundChangedEventFilter;
+
+    "LiquidationFeeRatioChanged(uint256)"(
+      liquidationFeeRatio?: null
+    ): LiquidationFeeRatioChangedEventFilter;
+    LiquidationFeeRatioChanged(
+      liquidationFeeRatio?: null
+    ): LiquidationFeeRatioChangedEventFilter;
+
+    "MarginChanged(address,address,int256,int256)"(
+      sender?: string | null,
+      amm?: string | null,
+      amount?: null,
+      fundingPayment?: null
+    ): MarginChangedEventFilter;
+    MarginChanged(
+      sender?: string | null,
+      amm?: string | null,
+      amount?: null,
+      fundingPayment?: null
+    ): MarginChangedEventFilter;
+
+    "MarginRatioChanged(uint256)"(
+      marginRatio?: null
+    ): MarginRatioChangedEventFilter;
+    MarginRatioChanged(marginRatio?: null): MarginRatioChangedEventFilter;
 
     "OwnershipTransferred(address,address)"(
-      previousOwner?: PromiseOrValue<string> | null,
-      newOwner?: PromiseOrValue<string> | null
+      previousOwner?: string | null,
+      newOwner?: string | null
     ): OwnershipTransferredEventFilter;
     OwnershipTransferred(
-      previousOwner?: PromiseOrValue<string> | null,
-      newOwner?: PromiseOrValue<string> | null
+      previousOwner?: string | null,
+      newOwner?: string | null
     ): OwnershipTransferredEventFilter;
 
     "Paused(address)"(account?: null): PausedEventFilter;
     Paused(account?: null): PausedEventFilter;
 
-    "PositionChanged(address,address,int256,int256,uint256,int256,int256,uint256)"(
-      trader?: PromiseOrValue<string> | null,
-      baseToken?: PromiseOrValue<string> | null,
+    "PositionAdjusted(address,address,int256,uint256,uint256)"(
+      amm?: string | null,
+      trader?: string | null,
+      newPositionSize?: null,
+      oldLiquidityIndex?: null,
+      newLiquidityIndex?: null
+    ): PositionAdjustedEventFilter;
+    PositionAdjusted(
+      amm?: string | null,
+      trader?: string | null,
+      newPositionSize?: null,
+      oldLiquidityIndex?: null,
+      newLiquidityIndex?: null
+    ): PositionAdjustedEventFilter;
+
+    "PositionChanged(address,address,uint256,uint256,int256,uint256,int256,int256,int256,uint256,uint256,uint256,int256)"(
+      trader?: string | null,
+      amm?: string | null,
+      margin?: null,
+      positionNotional?: null,
       exchangedPositionSize?: null,
-      exchangedPositionNotional?: null,
       fee?: null,
-      openNotional?: null,
+      positionSizeAfter?: null,
       realizedPnl?: null,
-      sqrtPriceAfterX96?: null
+      unrealizedPnlAfter?: null,
+      badDebt?: null,
+      liquidationPenalty?: null,
+      spotPrice?: null,
+      fundingPayment?: null
     ): PositionChangedEventFilter;
     PositionChanged(
-      trader?: PromiseOrValue<string> | null,
-      baseToken?: PromiseOrValue<string> | null,
+      trader?: string | null,
+      amm?: string | null,
+      margin?: null,
+      positionNotional?: null,
       exchangedPositionSize?: null,
-      exchangedPositionNotional?: null,
       fee?: null,
-      openNotional?: null,
+      positionSizeAfter?: null,
       realizedPnl?: null,
-      sqrtPriceAfterX96?: null
+      unrealizedPnlAfter?: null,
+      badDebt?: null,
+      liquidationPenalty?: null,
+      spotPrice?: null,
+      fundingPayment?: null
     ): PositionChangedEventFilter;
 
-    "PositionClosed(address,address,int256,int256,int256,int256,uint256)"(
-      trader?: PromiseOrValue<string> | null,
-      baseToken?: PromiseOrValue<string> | null,
-      closedPositionSize?: null,
-      closedPositionNotional?: null,
-      openNotional?: null,
-      realizedPnl?: null,
-      closedPrice?: null
-    ): PositionClosedEventFilter;
-    PositionClosed(
-      trader?: PromiseOrValue<string> | null,
-      baseToken?: PromiseOrValue<string> | null,
-      closedPositionSize?: null,
-      closedPositionNotional?: null,
-      openNotional?: null,
-      realizedPnl?: null,
-      closedPrice?: null
-    ): PositionClosedEventFilter;
-
-    "PositionLiquidated(address,address,uint256,uint256,uint256,address)"(
-      trader?: PromiseOrValue<string> | null,
-      baseToken?: PromiseOrValue<string> | null,
+    "PositionLiquidated(address,address,uint256,uint256,uint256,address,uint256)"(
+      trader?: string | null,
+      amm?: string | null,
       positionNotional?: null,
       positionSize?: null,
       liquidationFee?: null,
-      liquidator?: null
+      liquidator?: null,
+      badDebt?: null
     ): PositionLiquidatedEventFilter;
     PositionLiquidated(
-      trader?: PromiseOrValue<string> | null,
-      baseToken?: PromiseOrValue<string> | null,
+      trader?: string | null,
+      amm?: string | null,
       positionNotional?: null,
       positionSize?: null,
       liquidationFee?: null,
-      liquidator?: null
+      liquidator?: null,
+      badDebt?: null
     ): PositionLiquidatedEventFilter;
 
+    "PositionSettled(address,address,uint256)"(
+      amm?: string | null,
+      trader?: string | null,
+      valueTransferred?: null
+    ): PositionSettledEventFilter;
+    PositionSettled(
+      amm?: string | null,
+      trader?: string | null,
+      valueTransferred?: null
+    ): PositionSettledEventFilter;
+
     "ReferredPositionChanged(bytes32)"(
-      referralCode?: PromiseOrValue<BytesLike> | null
+      referralCode?: BytesLike | null
     ): ReferredPositionChangedEventFilter;
     ReferredPositionChanged(
-      referralCode?: PromiseOrValue<BytesLike> | null
+      referralCode?: BytesLike | null
     ): ReferredPositionChangedEventFilter;
 
-    "TrustedForwarderChanged(address)"(
-      forwarder?: PromiseOrValue<string> | null
-    ): TrustedForwarderChangedEventFilter;
-    TrustedForwarderChanged(
-      forwarder?: PromiseOrValue<string> | null
-    ): TrustedForwarderChangedEventFilter;
-
-    "TrustedForwarderUpdated(address)"(
-      trustedForwarder?: null
-    ): TrustedForwarderUpdatedEventFilter;
-    TrustedForwarderUpdated(
-      trustedForwarder?: null
-    ): TrustedForwarderUpdatedEventFilter;
+    "RestrictionModeEntered(address,uint256)"(
+      amm?: null,
+      blockNumber?: null
+    ): RestrictionModeEnteredEventFilter;
+    RestrictionModeEntered(
+      amm?: null,
+      blockNumber?: null
+    ): RestrictionModeEnteredEventFilter;
 
     "Unpaused(address)"(account?: null): UnpausedEventFilter;
     Unpaused(account?: null): UnpausedEventFilter;
   };
 
   estimateGas: {
-    addLiquidity(
-      params: IClearingHouse.AddLiquidityParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    addMargin(
+      _amm: string,
+      _addedMargin: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
-    cancelAllExcessOrders(
-      maker: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    cancelExcessOrders(
-      maker: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      orderIds: PromiseOrValue<BytesLike>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    backstopLiquidityProviderMap(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<BigNumber>;
 
     candidate(overrides?: CallOverrides): Promise<BigNumber>;
 
     closePosition(
-      params: IClearingHouse.ClosePositionParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      _amm: string,
+      _quoteAssetAmountLimit: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
-    getAccountBalance(overrides?: CallOverrides): Promise<BigNumber>;
+    feePool(overrides?: CallOverrides): Promise<BigNumber>;
 
-    getAccountValue(
-      trader: PromiseOrValue<string>,
+    getLatestCumulativePremiumFraction(
+      _amm: string,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
-    getClearingHouseConfig(overrides?: CallOverrides): Promise<BigNumber>;
+    getMarginRatio(
+      _amm: string,
+      _trader: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    getDelegateApproval(overrides?: CallOverrides): Promise<BigNumber>;
+    getPosition(
+      _amm: string,
+      _trader: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    getExchange(overrides?: CallOverrides): Promise<BigNumber>;
+    getPositionNotionalAndUnrealizedPnl(
+      _amm: string,
+      _trader: string,
+      _pnlCalcOption: BigNumberish,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    getInsuranceFund(overrides?: CallOverrides): Promise<BigNumber>;
+    getUnadjustedPosition(
+      _amm: string,
+      _trader: string,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
 
-    getOrderBook(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getQuoteToken(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getTrustedForwarder(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getUniswapV3Factory(overrides?: CallOverrides): Promise<BigNumber>;
-
-    getVault(overrides?: CallOverrides): Promise<BigNumber>;
+    initMarginRatio(overrides?: CallOverrides): Promise<BigNumber>;
 
     initialize(
-      clearingHouseConfigArg: PromiseOrValue<string>,
-      vaultArg: PromiseOrValue<string>,
-      quoteTokenArg: PromiseOrValue<string>,
-      uniV3FactoryArg: PromiseOrValue<string>,
-      exchangeArg: PromiseOrValue<string>,
-      accountBalanceArg: PromiseOrValue<string>,
-      insuranceFundArg: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      _initMarginRatio: BigNumberish,
+      _insuranceFund: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
-    isTrustedForwarder(
-      forwarder: PromiseOrValue<string>,
+    insuranceFund(overrides?: CallOverrides): Promise<BigNumber>;
+
+    liquidate(
+      _amm: string,
+      _trader: string,
+      overrides?: Overrides & { from?: string }
+    ): Promise<BigNumber>;
+
+    liquidateWithSlippage(
+      _amm: string,
+      _trader: string,
+      _quoteAssetAmountLimit: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
+    ): Promise<BigNumber>;
+
+    liquidationFeeRatio(overrides?: CallOverrides): Promise<BigNumber>;
+
+    maintenanceMarginRatio(overrides?: CallOverrides): Promise<BigNumber>;
+
+    openInterestNotionalMap(
+      arg0: string,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-
-    "liquidate(address,address,int256)"(
-      trader: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      positionSize: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    "liquidate(address,address)"(
-      trader: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
     ): Promise<BigNumber>;
 
     openPosition(
-      params: IClearingHouse.OpenPositionParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
-
-    openPositionFor(
-      trader: PromiseOrValue<string>,
-      params: IClearingHouse.OpenPositionParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      _amm: string,
+      _side: BigNumberish,
+      _quoteAssetAmount: Decimal.DecimalStruct,
+      _leverage: Decimal.DecimalStruct,
+      _baseAssetAmountLimit: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
     owner(overrides?: CallOverrides): Promise<BigNumber>;
 
-    pause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
+    partialLiquidationRatio(overrides?: CallOverrides): Promise<BigNumber>;
+
+    pause(overrides?: Overrides & { from?: string }): Promise<BigNumber>;
 
     paused(overrides?: CallOverrides): Promise<BigNumber>;
 
-    quitMarket(
-      trader: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    payFunding(
+      _amm: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
-    removeLiquidity(
-      params: IClearingHouse.RemoveLiquidityParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    removeMargin(
+      _amm: string,
+      _removedMargin: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
-    setDelegateApproval(
-      delegateApprovalArg: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    setBackstopLiquidityProvider(
+      account: string,
+      isProvider: boolean,
+      overrides?: Overrides & { from?: string }
+    ): Promise<BigNumber>;
+
+    setFeePool(
+      _feePool: string,
+      overrides?: Overrides & { from?: string }
+    ): Promise<BigNumber>;
+
+    setLiquidationFeeRatio(
+      _liquidationFeeRatio: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
+    ): Promise<BigNumber>;
+
+    setMaintenanceMarginRatio(
+      _maintenanceMarginRatio: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
     setOwner(
-      newOwner: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      newOwner: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
-    settleAllFunding(
-      trader: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    setPartialLiquidationRatio(
+      _ratio: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
-    uniswapV3MintCallback(
-      amount0Owed: PromiseOrValue<BigNumberish>,
-      amount1Owed: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    setWhitelist(
+      _whitelist: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
-    uniswapV3SwapCallback(
-      amount0Delta: PromiseOrValue<BigNumberish>,
-      amount1Delta: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    settlePosition(
+      _amm: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<BigNumber>;
 
-    unpause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
+    unpause(overrides?: Overrides & { from?: string }): Promise<BigNumber>;
 
-    updateOwner(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<BigNumber>;
+    updateOwner(overrides?: Overrides & { from?: string }): Promise<BigNumber>;
 
     versionRecipient(overrides?: CallOverrides): Promise<BigNumber>;
   };
 
   populateTransaction: {
-    addLiquidity(
-      params: IClearingHouse.AddLiquidityParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    addMargin(
+      _amm: string,
+      _addedMargin: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
-    cancelAllExcessOrders(
-      maker: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    cancelExcessOrders(
-      maker: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      orderIds: PromiseOrValue<BytesLike>[],
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    backstopLiquidityProviderMap(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     candidate(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     closePosition(
-      params: IClearingHouse.ClosePositionParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      _amm: string,
+      _quoteAssetAmountLimit: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
-    getAccountBalance(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    feePool(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    getAccountValue(
-      trader: PromiseOrValue<string>,
+    getLatestCumulativePremiumFraction(
+      _amm: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getClearingHouseConfig(
+    getMarginRatio(
+      _amm: string,
+      _trader: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getDelegateApproval(
+    getPosition(
+      _amm: string,
+      _trader: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getExchange(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getInsuranceFund(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getOrderBook(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getQuoteToken(overrides?: CallOverrides): Promise<PopulatedTransaction>;
-
-    getTrustedForwarder(
+    getPositionNotionalAndUnrealizedPnl(
+      _amm: string,
+      _trader: string,
+      _pnlCalcOption: BigNumberish,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getUniswapV3Factory(
+    getUnadjustedPosition(
+      _amm: string,
+      _trader: string,
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    getVault(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    initMarginRatio(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
     initialize(
-      clearingHouseConfigArg: PromiseOrValue<string>,
-      vaultArg: PromiseOrValue<string>,
-      quoteTokenArg: PromiseOrValue<string>,
-      uniV3FactoryArg: PromiseOrValue<string>,
-      exchangeArg: PromiseOrValue<string>,
-      accountBalanceArg: PromiseOrValue<string>,
-      insuranceFundArg: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      _initMarginRatio: BigNumberish,
+      _insuranceFund: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
-    isTrustedForwarder(
-      forwarder: PromiseOrValue<string>,
+    insuranceFund(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    liquidate(
+      _amm: string,
+      _trader: string,
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    liquidateWithSlippage(
+      _amm: string,
+      _trader: string,
+      _quoteAssetAmountLimit: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    liquidationFeeRatio(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "liquidate(address,address,int256)"(
-      trader: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      positionSize: PromiseOrValue<BigNumberish>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    maintenanceMarginRatio(
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
-    "liquidate(address,address)"(
-      trader: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    openInterestNotionalMap(
+      arg0: string,
+      overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 
     openPosition(
-      params: IClearingHouse.OpenPositionParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
-    ): Promise<PopulatedTransaction>;
-
-    openPositionFor(
-      trader: PromiseOrValue<string>,
-      params: IClearingHouse.OpenPositionParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      _amm: string,
+      _side: BigNumberish,
+      _quoteAssetAmount: Decimal.DecimalStruct,
+      _leverage: Decimal.DecimalStruct,
+      _baseAssetAmountLimit: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
     owner(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
+    partialLiquidationRatio(
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
     pause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
     paused(overrides?: CallOverrides): Promise<PopulatedTransaction>;
 
-    quitMarket(
-      trader: PromiseOrValue<string>,
-      baseToken: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    payFunding(
+      _amm: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
-    removeLiquidity(
-      params: IClearingHouse.RemoveLiquidityParamsStruct,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    removeMargin(
+      _amm: string,
+      _removedMargin: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
     renounceOwnership(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
-    setDelegateApproval(
-      delegateApprovalArg: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    setBackstopLiquidityProvider(
+      account: string,
+      isProvider: boolean,
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    setFeePool(
+      _feePool: string,
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    setLiquidationFeeRatio(
+      _liquidationFeeRatio: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
+    ): Promise<PopulatedTransaction>;
+
+    setMaintenanceMarginRatio(
+      _maintenanceMarginRatio: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
     setOwner(
-      newOwner: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      newOwner: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
-    settleAllFunding(
-      trader: PromiseOrValue<string>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    setPartialLiquidationRatio(
+      _ratio: Decimal.DecimalStruct,
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
-    uniswapV3MintCallback(
-      amount0Owed: PromiseOrValue<BigNumberish>,
-      amount1Owed: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    setWhitelist(
+      _whitelist: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
-    uniswapV3SwapCallback(
-      amount0Delta: PromiseOrValue<BigNumberish>,
-      amount1Delta: PromiseOrValue<BigNumberish>,
-      data: PromiseOrValue<BytesLike>,
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+    settlePosition(
+      _amm: string,
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
     unpause(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
     updateOwner(
-      overrides?: Overrides & { from?: PromiseOrValue<string> }
+      overrides?: Overrides & { from?: string }
     ): Promise<PopulatedTransaction>;
 
     versionRecipient(overrides?: CallOverrides): Promise<PopulatedTransaction>;

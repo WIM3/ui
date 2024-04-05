@@ -1,12 +1,13 @@
 import { useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 import create from "zustand";
-import { useStore } from "@/stores/root";
+import { getInitialState, useStore } from "@/stores/root";
 import { isAmmInfoValid } from "@/stores/slices/api/amm";
 import { addEthUsdMarket } from "@/v2-integration/addMarket";
 import { getPositions, getRecentPositions } from "@/v2-integration/getPositions";
 import { providers } from "ethers";
 import { Markets } from "@/types/api";
+import { useWeb3React } from "@web3-react/core";
 
 interface SocketStore {
   connected: boolean;
@@ -32,9 +33,6 @@ const hasReservedEvent = (channel: string) =>
   [SocketEvents.connect, SocketEvents.disconnect].includes(
     channel as SocketEvents
   );
-
-
-
 
 export const useMarkets = () => {
   const { connected, setConnected } = useSocketStore((state) => state);
@@ -87,11 +85,19 @@ export const usePriceFeed = () => {
 };
 
 export const useUserPositions = () => {
-  const { setPositions } = useStore((state) => state.userPositions);
+  const { setPositions} = useStore((state) => state.userPositions);
+  const {
+    account,
+  } = useWeb3React();
   useEffect(() => {
-    return setPositions([]);
+      
+      getPositions(account!).then((position) => {
+      
+        setPositions(position);
+      })
     
-  }, [setPositions]);
+     
+  }, [setPositions, account]);
 };
 
 export const useRecentPositions = () => {
@@ -104,4 +110,5 @@ export const useRecentPositions = () => {
     })
   }, [setPositions]);
 };
+
 
