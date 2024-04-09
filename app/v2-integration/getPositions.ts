@@ -47,7 +47,7 @@ export const getPositions = async (trader: string) =>{
     })
     let positions: any[] = []
     console.log("trader  ",results.data)
-    if(results.data.data.positionChangeds != undefined){
+    if(results.data.data.positionChangeds != undefined && results.data.data.positionChangeds.length > 0){
       positions = results.data.data.positionChangeds
     }
     let leverage = new BigNumber(positions[0].positionNotional).dividedBy(positions[0].margin)
