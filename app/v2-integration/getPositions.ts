@@ -53,8 +53,12 @@ export const getPositions = async (trader: string) =>{
     if(results.data.data.positionChangeds != undefined){
       positions = results.data.data.positionChangeds
     }
+    if(Number(positions[0].positionSizeAfter) == 0){
+      return []
+    }
     let leverage = new BigNumber(positions[0].positionNotional).dividedBy(positions[0].margin)
     console.log("user leveraga ", leverage.toString())
+    console.log("trader amm ", positions[0].positionSizeAfter)
     let position = {
         amm: positions[0].amm,
         leverage: leverage.toString(),
