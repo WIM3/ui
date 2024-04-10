@@ -89,10 +89,11 @@ export const useUserPositions = () => {
   const {
     account,
   } = useWeb3React();
+  
   useEffect(() => {
       
       getPositions(account!).then((position) => {
-      
+        
         setPositions(position);
       })
     

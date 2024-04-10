@@ -89,19 +89,20 @@ export const createPositionGridData = (
     const openNotional = toTokenUnit(position.openNotional);
     const markPrice = toTokenUnit(position.underlyingPrice,1);
     const timestamp = secondsToMilliseconds(position.timestamp);
+    console.log("size ", size.toString())
     const baseSize = formatNumber(size.abs(), {
       productId: baseCcy,
     });
+    console.log("basesize ", baseSize)
+    
     const quoteSize = entryPrice.multipliedBy(size).abs();
-    console.log("quote ",quoteSize.toString())
     const formattedQuoteSize = formatNumber(quoteSize, {
       productId: quoteCcy,
     });
-    console.log("f q: ", formattedQuoteSize)
     const liquidationPrice = formatUsdValue(
       openNotional.multipliedBy(new BigNumber(process.env.LIQ_FEE_RATIO!))
     );
-    const profitAndLoss = toTokenUnit(position.unrealizedPnl,1);
+    const profitAndLoss = toTokenUnit(position.unrealizedPnl);
     const formattedProfitAndLoss = formatNumber(profitAndLoss, {
       productId: quoteCcy,
     });

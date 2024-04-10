@@ -53,37 +53,59 @@ export const getPositions = async (trader: string) =>{
     if(results.data.data.positionChangeds != undefined){
       positions = results.data.data.positionChangeds
     }
-    if(Number(positions[0].positionSizeAfter) == 0){
-      return []
+    console.log("trader amm ", positions[1].positionSizeAfter)
+    console.log("id 0", positions[0].id)
+    console.log("id 1", positions[1].id)
+    console.log("id 2", positions[2].id)
+
+    // struct Position {
+    //   SignedDecimal.signedDecimal size;
+    //   Decimal.decimal margin;
+    //   Decimal.decimal openNotional;
+    //   SignedDecimal.signedDecimal lastUpdatedCumulativePremiumFraction;
+    //   uint256 liquidityHistoryIndex;
+    //   uint256 blockNumber;
+    // }
+
+    const provider = new ethers.providers.Web3Provider((window as any).ethereum)
+    const signer = provider.getSigner(trader)
+    const clearingHouse = new ethers.Contract(process.env.CLEARING_HOUSE!, clearingHouseAbi, signer)
+    let positonArr: any[] = []
+    console.log("positions ", positions.length)
+    for(let i = 0; i < positions.length; i++){
+      let leverage = getLeverage(Number(positions[i].positionNotional), Number(positions[i].margin))
+      console.log("position size ",Number(positions[i].positionSizeAfter))
+      let [size, , , , , ] = await clearingHouse.getPosition(positions[i].amm, trader)
+      if(Number(positions[i].unrealizedPnlAfter) != 0 && Number(size) != 0){
+        let p = {
+          amm: positions[i].amm,
+          leverage: `${leverage}`,
+          underlyingPrice: positions[i].spotPrice,
+          margin: positions[i].margin,
+          fee: positions[i].fee,
+          trader: positions[i].trader,
+          fundingPayment: positions[i].fundingPayment,
+          active: true,
+          tradingVolume: positions[i].exchangedPositionSize,
+          entryPrice: positions[i].positionSizeAfter,
+          badDebt: positions[i].badDebt,
+          size: positions[i].positionSizeAfter,
+          unrealizedPnl: positions[i].unrealizedPnlAfter,
+          totalPnlAmount: positions[i].unrealizedPnl,
+          openNotional: positions[i].positionNotional,
+          realizedPnl: positions[i].realizedPnl,
+          liquidationPenalty: positions[i].liquidationPenalty,
+          timestamp: positions[i].timestamp,
+        };
+        positonArr.push({
+          position: p,
+          history: []
+        })
+      }
     }
-    let leverage = new BigNumber(positions[0].positionNotional).dividedBy(positions[0].margin)
-    console.log("user leveraga ", leverage.toString())
-    console.log("trader amm ", positions[0].positionSizeAfter)
-    let position = {
-        amm: positions[0].amm,
-        leverage: leverage.toString(),
-        underlyingPrice: positions[0].spotPrice,
-        margin: positions[0].margin,
-        fee: positions[0].fee,
-        trader: positions[0].trader,
-        fundingPayment: positions[0].fundingPayment,
-        active: true,
-        tradingVolume: positions[0].exchangedPositionSize,
-        entryPrice: positions[0].positionSizeAfter,
-        badDebt: positions[0].badDebt,
-        size: positions[0].positionSizeAfter,
-        unrealizedPnl: positions[0].unrealizedPnlAfter,
-        totalPnlAmount: positions[0].unrealizedPnl,
-        openNotional: positions[0].positionNotional,
-        realizedPnl: positions[0].realizedPnl,
-        liquidationPenalty: positions[0].liquidationPenalty,
-        timestamp: positions[0].timestamp,
-    };
     
-    return [{
-        position: position,
-        history: []
-    }]
+    
+    return positonArr
           
 }
 
@@ -121,27 +143,54 @@ export const getRecentPositions = async (): Promise<PositionEvent[]> => {
     }
     
     positions.forEach((position: any) => {
-      let leverage = new BigNumber(position.positionNotional).dividedBy(position.margin)
-      console.log("leverage ", leverage.toString())
-      list.push(
-        {
-          entryPrice: `${position.positionSizeAfter}`,
-          underlyingPrice: `${position.spotPrice}`,
-          leverage: `${leverage.toString()}`,
-          timestamp: position.timestamp,
-          size: `${position.exchangedPositionSize}`,
-          type: "Changing",
-          fundingPayment: `${position.fundingPayment}`,
-        }       
-      )      
+      let leverage = getLeverage(Number(position.positionNotional), Number(position.margin))
+      console.log("leverage ", leverage)
+      if(Number(position.unrealizedPnlAfter) != 0){
+        list.push(
+          {
+            entryPrice: `${position.positionSizeAfter}`,
+            underlyingPrice: `${position.spotPrice}`,
+            leverage: `${leverage}`,
+            timestamp: position.timestamp,
+            size: `${position.exchangedPositionSize}`,
+            type: "Changing",
+            fundingPayment: `${position.fundingPayment}`,
+          })
+      }
+              
     });
     return list
 }
 
-const formatToX6 = (value: string) => {
-    let numberarr = value.split('.')
-    let sliced = numberarr[1].slice(0,6)
-    return [numberarr[0], sliced].join('')
+const getLeverage = (notional: number, margin: number) => {
+    if(notional / margin <= 1){
+      return 1
+    }
+    if(notional / margin <= 2){
+      return 2
+    }
+    if(notional / margin <= 3){
+      return 3
+    }
+    if(notional / margin <= 4){
+      return 4
+    }
+    if(notional / margin <= 5){
+      return 5
+    }
+    if(notional / margin <= 6){
+      return 6
+    }
+    if(notional / margin <= 7){
+      return 7
+    }
+    if(notional / margin <= 8){
+      return 8
+    }if(notional / margin <= 9){
+      return 9
+    }if(notional / margin <= 10){
+      return 10
+    }
 }
 
 const removeDot = (value: string) => {
