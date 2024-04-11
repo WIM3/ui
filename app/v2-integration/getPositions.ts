@@ -72,40 +72,49 @@ export const getPositions = async (trader: string) =>{
     const clearingHouse = new ethers.Contract(process.env.CLEARING_HOUSE!, clearingHouseAbi, signer)
     let positonArr: any[] = []
     console.log("positions ", positions.length)
+    let lastValidPosition = undefined
+    let lastTimeStamp = 0
     for(let i = 0; i < positions.length; i++){
       let leverage = getLeverage(Number(positions[i].positionNotional), Number(positions[i].margin))
       console.log("position size ",Number(positions[i].positionSizeAfter))
       let [size, , , , , ] = await clearingHouse.getPosition(positions[i].amm, trader)
-      if(Number(positions[i].unrealizedPnlAfter) != 0 && Number(size) != 0){
-        let p = {
-          amm: positions[i].amm,
-          leverage: `${leverage}`,
-          underlyingPrice: positions[i].spotPrice,
-          margin: positions[i].margin,
-          fee: positions[i].fee,
-          trader: positions[i].trader,
-          fundingPayment: positions[i].fundingPayment,
-          active: true,
-          tradingVolume: positions[i].exchangedPositionSize,
-          entryPrice: positions[i].positionSizeAfter,
-          badDebt: positions[i].badDebt,
-          size: positions[i].positionSizeAfter,
-          unrealizedPnl: positions[i].unrealizedPnlAfter,
-          totalPnlAmount: positions[i].unrealizedPnl,
-          openNotional: positions[i].positionNotional,
-          realizedPnl: positions[i].realizedPnl,
-          liquidationPenalty: positions[i].liquidationPenalty,
-          timestamp: positions[i].timestamp,
-        };
-        positonArr.push({
-          position: p,
-          history: []
-        })
+      console.log("contract position size ", size.toString())
+      if(isOpenPosition(positions[i].positionSizeAfter, size.toString()) && Number(size.toString()) != 0){
+        if(lastTimeStamp < Number(positions[i].timestamp)){
+          lastValidPosition = {
+            amm: positions[i].amm,
+            leverage: `${leverage}`,
+            underlyingPrice: positions[i].spotPrice,
+            margin: positions[i].margin,
+            fee: positions[i].fee,
+            trader: positions[i].trader,
+            fundingPayment: positions[i].fundingPayment,
+            active: true,
+            tradingVolume: positions[i].exchangedPositionSize,
+            entryPrice: positions[i].positionSizeAfter,
+            badDebt: positions[i].badDebt,
+            size: size,
+            unrealizedPnl: positions[i].unrealizedPnlAfter,
+            totalPnlAmount: positions[i].unrealizedPnl,
+            openNotional: positions[i].positionNotional,
+            realizedPnl: positions[i].realizedPnl,
+            liquidationPenalty: positions[i].liquidationPenalty,
+            timestamp: positions[i].timestamp,
+          };
+        }
+        
+        
       }
     }
     
-    
-    return positonArr
+    if(lastValidPosition != undefined){
+      positonArr.push({
+        position: lastValidPosition,
+        history: []
+      })
+      return positonArr 
+    }
+    return []
           
 }
 
@@ -193,9 +202,47 @@ const getLeverage = (notional: number, margin: number) => {
     }
 }
 
+const isOpenPosition = (subgraphSize: string, contractSize: string) => {
+    if(Number(subgraphSize) == 0){
+      return false
+    }
+    let newsSize = removeZeros(subgraphSize)
+    
+    let slicedcs
+    if(Number(contractSize) < 0){
+      slicedcs = contractSize.slice(0,newsSize.length + 1)
+    } else {
+      slicedcs = contractSize.slice(0,newsSize.length)
+    }
+    console.log('s cs ', slicedcs)
+    console.log("n size ", newsSize)
+    if(newsSize == slicedcs){
+      return true
+    }
+    if(Number(slicedcs) < 0 && Number(newsSize) * -1 == Number(slicedcs)){
+      return true
+    }
+    return false
+}
+
 const removeDot = (value: string) => {
     let newValuearr = value.split('.')
     let newValue = newValuearr.join('')
     return newValue
+}
+
+const removeZeros = (num: string) => {
+    let snum = num.split('.')
+    if(Number(snum[0]) > 0){
+      return [snum[0], snum[1]].join('')
+    } 
+    let i = 0   
+    for(i; i < snum[1].length; i++){
+      if(Number(snum[1][i]) != 0){
+        break
+      }
+    }
+    let newNum = snum[1].slice(i,snum[1].length)
+    return newNum
 }
 

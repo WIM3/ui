@@ -37,18 +37,14 @@ export const formatNumber = (
     withThousandSeparator = true,
   }: FormatNumberOptions = {}
 ) => {
-  console.log("num ", num)
   const convertedNum = new BigNumber(num);
-  console.log("converted num ", convertedNum.toString())
   if (convertedNum.isNaN()) return "";
 
   let roundedNum: BigNumber
   if(convertedNum.toString().includes('.')){
     roundedNum = new BigNumber(roundBigNumber(convertedNum, 2))
-    console.log("if rounded ", roundedNum.toString())
   } else{
     roundedNum = convertedNum.decimalPlaces(base);
-    console.log("else rounded ", roundedNum.toString())
   }
   
   const product = productId ? getProduct(productId).symbol : null;
@@ -74,7 +70,6 @@ const roundBigNumber = (amount: BigNumber, base: number) => {
       decimal = decimal.replace('e', '0')
     }
     let newAmount = [amountArr[0], decimal].join('.')
-    console.log("rounded str num ", newAmount)
     return newAmount
 }
 
