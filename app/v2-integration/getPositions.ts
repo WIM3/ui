@@ -93,7 +93,7 @@ export const getPositions = async (trader: string) =>{
             tradingVolume: positions[i].exchangedPositionSize,
             entryPrice: positions[i].positionSizeAfter,
             badDebt: positions[i].badDebt,
-            size: size,
+            size: positions[i].positionSizeAfter,
             unrealizedPnl: positions[i].unrealizedPnlAfter,
             totalPnlAmount: positions[i].unrealizedPnl,
             openNotional: positions[i].positionNotional,
