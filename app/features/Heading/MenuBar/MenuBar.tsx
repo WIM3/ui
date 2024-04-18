@@ -27,7 +27,7 @@ export const MenuBar = () => {
 
   const handleGetEthClick = () => {
     window.open(
-      "https://faucet.quicknode.com/optimism/goerli",
+      "https://faucet.quicknode.com/optimism/sepolia",
       "_blank"
     );
   };
