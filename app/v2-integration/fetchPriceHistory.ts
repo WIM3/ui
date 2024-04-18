@@ -21,6 +21,11 @@ export const fetchPriceEthUsdHistory = async (): Promise<Array<PriceUpdate>> => 
 
   const response = await fetch(url)
   const data: PriceHistoryDto = await response.json()
+
+  if (!data.t) {
+    return []
+  }
+
   const mappedData = data.t.map((timestamp: number, index: number) => { 
     const priceInWei = utils.parseUnits(data.c[index].toString(), 18)
     return {
