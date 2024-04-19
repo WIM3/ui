@@ -15,7 +15,6 @@ const vaultAbi = require("../defi/contracts/abi/Vault.json")
 const exchangeAbi = require("../defi/contracts/abi/Exchange.json")
 
 export const getPositions = async (trader: string) =>{
-    console.log("trader address", trader)
     if(trader == undefined){
       return []
     }
@@ -49,14 +48,9 @@ export const getPositions = async (trader: string) =>{
       return []
     }
     let positions: any[] = []
-    console.log("trader  ",results.data)
     if(results.data.data.positionChangeds != undefined){
       positions = results.data.data.positionChangeds
     }
-    console.log("trader amm ", positions[1].positionSizeAfter)
-    console.log("id 0", positions[0].id)
-    console.log("id 1", positions[1].id)
-    console.log("id 2", positions[2].id)
 
     // struct Position {
     //   SignedDecimal.signedDecimal size;
@@ -71,19 +65,17 @@ export const getPositions = async (trader: string) =>{
     const signer = provider.getSigner(trader)
     const clearingHouse = new ethers.Contract(process.env.CLEARING_HOUSE!, clearingHouseAbi, signer)
     let positonArr: any[] = []
-    console.log("positions ", positions.length)
     let lastValidPosition = undefined
     let lastTimeStamp = 0
     for(let i = 0; i < positions.length; i++){
-      let leverage = getLeverage(Number(positions[i].positionNotional), Number(positions[i].margin))
-      console.log("position size ",Number(positions[i].positionSizeAfter))
-      let [size, , , , , ] = await clearingHouse.getPosition(positions[i].amm, trader)
-      console.log("contract position size ", size.toString())
+      
+      let [size, margin, openNotional, , , ] = await clearingHouse.getPosition(positions[i].amm, trader)
+      let leverage = openNotional.d.div(margin.d)
       if(isOpenPosition(positions[i].positionSizeAfter, size.toString()) && Number(size.toString()) != 0){
         if(lastTimeStamp < Number(positions[i].timestamp)){
           lastValidPosition = {
             amm: positions[i].amm,
-            leverage: `${leverage}`,
+            leverage: leverage.toString(),
             underlyingPrice: positions[i].spotPrice,
             margin: positions[i].margin,
             fee: positions[i].fee,
@@ -153,7 +145,6 @@ export const getRecentPositions = async (): Promise<PositionEvent[]> => {
     
     positions.forEach((position: any) => {
       let leverage = getLeverage(Number(position.positionNotional), Number(position.margin))
-      console.log("leverage ", leverage)
       if(Number(position.unrealizedPnlAfter) != 0){
         list.push(
           {
@@ -214,8 +205,6 @@ const isOpenPosition = (subgraphSize: string, contractSize: string) => {
     } else {
       slicedcs = contractSize.slice(0,newsSize.length)
     }
-    console.log('s cs ', slicedcs)
-    console.log("n size ", newsSize)
     if(newsSize == slicedcs){
       return true
     }

@@ -89,11 +89,9 @@ export const createPositionGridData = (
     const openNotional = toTokenUnit(position.openNotional);
     const markPrice = toTokenUnit(position.underlyingPrice,1);
     const timestamp = secondsToMilliseconds(position.timestamp);
-    console.log("size ", size.toString())
     const baseSize = formatNumber(size.abs(), {
       productId: baseCcy,
     });
-    console.log("basesize ", baseSize)
     
     const quoteSize = entryPrice.multipliedBy(size).abs();
     const formattedQuoteSize = formatNumber(quoteSize, {

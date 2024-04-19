@@ -24,7 +24,7 @@ export default function useAssetAmount() {
   } = useStore((state) => state.tradingSidebar);
   const { underlyingPrice } = useStore((state) => state.amm);
   const sidebarInputsEnabled = useStore(isSidebarInputsEnabled);
-  const exchangeRate = toTokenUnit(underlyingPrice);
+  const exchangeRate = new BigNumber(formatPrice(underlyingPrice));
   let balance = <BigNumber>balanceValue;
   
   const [baseProduct, quoteProduct] = getPair(pairId).productIds;
@@ -72,8 +72,15 @@ export default function useAssetAmount() {
       balance,
       exchangeRate
     );
-
-    setAmounts(utils.formatUnits(baseAmount,18), quoteAmount);
+    let formatedAmount = ''
+    
+    if(baseAmount == '0' || value == ''){
+      formatedAmount = '0'
+    } else {
+      formatedAmount = baseAmount
+    }
+    
+    setAmounts(formatedAmount, quoteAmount);
   };
 
   const handleQuoteAmountChange = ({
@@ -100,4 +107,15 @@ export default function useAssetAmount() {
     handleBaseAmountChange,
     handleQuoteAmountChange,
   };
+}
+
+const formatPrice = (price: string) =>{
+    let splitPrice = price.split('.')
+    if(splitPrice[1] == undefined){
+      return price
+    }
+    if(splitPrice[1].length < 6){
+      splitPrice[1] = splitPrice[1] + '0'.repeat(6 - splitPrice[1].length)
+    }
+    return [splitPrice[0], splitPrice[1]].join('.')
 }

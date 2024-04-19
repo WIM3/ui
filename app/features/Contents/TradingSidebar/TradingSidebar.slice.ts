@@ -94,7 +94,7 @@ export const isTradingSidebarEnabled = (state: AppState) => {
     state.connection.active &&
     isMarkPriceValid(state)
   );
-  return true
+  
 };
 
 export const isSidebarInputsEnabled = (state: AppState) => {

@@ -11,7 +11,7 @@ export const calculateBaseAmount = (
   const maxBaseAmount = balance.dividedBy(exchangeRate);
 
   return baseAmount.isGreaterThan(maxBaseAmount)
-    ? toFixedNumber(maxBaseAmount)
+    ? maxBaseAmount.toString()
     : amount;
 };
 

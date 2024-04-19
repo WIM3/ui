@@ -17,7 +17,10 @@ export const fetchCurrentEthUsdPriceFromPythNetwork = async (): Promise<number> 
   // Get the price if it is not older than 60 seconds from the current time.
   const latestEthUsdPrice = priceFeeds![0].getPriceNoOlderThan(60); // Price { conf: '1234', expo: -8, price: '12345678' }
   const priceInWei = latestEthUsdPrice?.price;
+  console.log("price in wei ", priceInWei)
   // Parse the price to a number
   const priceInEth = utils.formatUnits(priceInWei!, 8);
+  console.log("price in eth ", priceInEth)
+  
   return +priceInEth
 };
