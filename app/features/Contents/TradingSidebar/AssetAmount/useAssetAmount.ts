@@ -92,7 +92,7 @@ export default function useAssetAmount() {
       balance,
       exchangeRate
     );
-    setAmounts(utils.formatUnits(baseAmount,18), quoteAmount);
+    setAmounts(baseAmount, quoteAmount);
   };
 
   return {
