@@ -82,18 +82,19 @@ export const createPositionGridData = (
   return activePositions.map((position) => {
     const pair = getPair(PairId.ETHUSDC);
     const [baseCcy, quoteCcy] = pair.productIds;
+    console.log("position size 1", position.size)
     const size = toTokenUnit(position.size);
     const direction = size.lt(0) ? Directions.Short : Directions.Long;
     const leverage = position.leverage;
     const entryPrice = new BigNumber(position.entryPrice);
     const openNotional = toTokenUnit(position.openNotional);
-    const markPrice = toTokenUnit(position.underlyingPrice,1);
+    const markPrice = position.underlyingPrice;
     const timestamp = secondsToMilliseconds(position.timestamp);
     const baseSize = formatNumber(size.abs(), {
       productId: baseCcy,
     });
     
-    const quoteSize = entryPrice.multipliedBy(size).abs();
+    const quoteSize = openNotional;
     const formattedQuoteSize = formatNumber(quoteSize, {
       productId: quoteCcy,
     });
@@ -101,9 +102,8 @@ export const createPositionGridData = (
       openNotional.multipliedBy(new BigNumber(process.env.LIQ_FEE_RATIO!))
     );
     const profitAndLoss = toTokenUnit(position.unrealizedPnl);
-    const formattedProfitAndLoss = formatNumber(profitAndLoss, {
-      productId: quoteCcy,
-    });
+    console.log("profit and loss ",profitAndLoss.toString())
+    const formattedProfitAndLoss = toUSDWithDot(profitAndLoss.toString())
     const pnlROE = profitAndLoss.div(quoteSize).multipliedBy(100);
     const formattedPnlROE = formatNumber(pnlROE.isNaN() ? 0 : pnlROE);
 
@@ -121,8 +121,8 @@ export const createPositionGridData = (
       size: `${baseSize} (${formattedQuoteSize})`,
       date: format(timestamp, "dd/MM/yyyy"),
       time: format(timestamp, "HH:mm:ss"),
-      entryPrice: formatUsdValue(entryPrice.multipliedBy(100)),
-      markPrice: formatUsdValue(markPrice),
+      entryPrice: toUSD(entryPrice.toString()),
+      markPrice: toUSD(markPrice.toString()),
       liquidationPrice,
       profitAndLoss: `${formattedProfitAndLoss} (${formattedPnlROE}%)`,
       originalProfitAndLoss: profitAndLoss,
@@ -216,3 +216,18 @@ export const createNotificationHistoryData = (
     };
   });
 };
+
+const toUSD = (value: string) => {
+  let decimals = value.slice(value.length - 6, value.length)
+  let units = value.slice(0, value.length - 6)
+
+  let beforeComma = units[0]
+  let afterComma = units.slice(1, units.length)
+  return ['$ ',[[beforeComma,afterComma].join(','),decimals].join('.')].join('')
+}
+
+const toUSDWithDot = (value: string) => {
+  let sValue = value.split('.')
+  let decimals = sValue[1].slice(0, 6)
+  return [sValue[0], decimals].join('.')
+}

@@ -6,8 +6,9 @@ import { isAmmInfoValid } from "@/stores/slices/api/amm";
 import { addEthUsdMarket } from "@/v2-integration/addMarket";
 import { getPositions, getRecentPositions } from "@/v2-integration/getPositions";
 import { providers } from "ethers";
-import { Markets } from "@/types/api";
+import { Markets, PriceUpdate } from "@/types/api";
 import { useWeb3React } from "@web3-react/core";
+import { getHistoryData } from "@/stores/slices/api/priceHistory";
 
 interface SocketStore {
   connected: boolean;
@@ -86,6 +87,9 @@ export const usePriceFeed = () => {
 
 export const useUserPositions = () => {
   const { setPositions} = useStore((state) => state.userPositions);
+  const state = useStore((state) => state)
+  const { feed} = useStore((state) => state.priceHistory);
+  
   const {
     account,
   } = useWeb3React();

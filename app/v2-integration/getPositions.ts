@@ -4,8 +4,10 @@ import { formatUsdValue, toTokenUnit } from "@/utils/formatters";
 import axios from "axios";
 import BigNumber from "bignumber.js";
 import { format, secondsToMilliseconds } from "date-fns";
-import { ethers, providers } from "ethers";
+import { ethers, providers, utils } from "ethers";
 import create from "zustand";
+import { PriceUpdate } from "@/types/api";
+import { fetchCurrentEthUsdPriceFromPythNetwork } from "@/v2-integration/fetchTokenPrice";
 
 
 const clearingHouseAbi = require("../defi/contracts/abi/ClearingHouse.json")
@@ -44,14 +46,16 @@ export const getPositions = async (trader: string) =>{
       }
     `
     })
-    if(results.data.data.positionChangeds.length == 0){
-      return []
-    }
+    
+  
     let positions: any[] = []
-    if(results.data.data.positionChangeds != undefined){
+    if(results.data.data != undefined || results.data.data.positionChangeds != undefined){
       positions = results.data.data.positionChangeds
     }
 
+    if(results.data.data.positionChangeds.length == 0){
+      return []
+    }
     // struct Position {
     //   SignedDecimal.signedDecimal size;
     //   Decimal.decimal margin;
@@ -70,25 +74,38 @@ export const getPositions = async (trader: string) =>{
     for(let i = 0; i < positions.length; i++){
       
       let [size, margin, openNotional, , , ] = await clearingHouse.getPosition(positions[i].amm, trader)
+      if(margin.d.toString() == '0'){
+        continue
+      }
+      console.log("size ", size.toString())
+      console.log("margin ", margin.toString())
+      console.log("open notional", openNotional.toString())
+      let [notional, unPnL] = await clearingHouse.getPositionNotionalAndUnrealizedPnl(positions[i].amm, trader, 1)
+      console.log("notional ", notional.toString())
+      console.log("PnL ", unPnL.toString())
       let leverage = openNotional.d.div(margin.d)
       if(isOpenPosition(positions[i].positionSizeAfter, size.toString()) && Number(size.toString()) != 0){
         if(lastTimeStamp < Number(positions[i].timestamp)){
+          let unPrice = await fetchCurrentEthUsdPriceFromPythNetwork()
+          let entryPrice = await getEntryPrice(positions[i].timestamp)
+          console.log("un price from pyth ", `${unPrice}`)
+          console.log("underlyng price ", toUsdFormat(`${unPrice}`))
           lastValidPosition = {
             amm: positions[i].amm,
             leverage: leverage.toString(),
-            underlyingPrice: positions[i].spotPrice,
+            underlyingPrice: toUsdFormat(unPrice.toString()),
             margin: positions[i].margin,
             fee: positions[i].fee,
             trader: positions[i].trader,
             fundingPayment: positions[i].fundingPayment,
             active: true,
             tradingVolume: positions[i].exchangedPositionSize,
-            entryPrice: positions[i].positionSizeAfter,
+            entryPrice: entryPrice,
             badDebt: positions[i].badDebt,
-            size: positions[i].positionSizeAfter,
-            unrealizedPnl: positions[i].unrealizedPnlAfter,
+            size: size.toString(),
+            unrealizedPnl: unPnL.toString(),
             totalPnlAmount: positions[i].unrealizedPnl,
-            openNotional: positions[i].positionNotional,
+            openNotional: openNotional.toString(),
             realizedPnl: positions[i].realizedPnl,
             liquidationPenalty: positions[i].liquidationPenalty,
             timestamp: positions[i].timestamp,
@@ -139,26 +156,27 @@ export const getRecentPositions = async (): Promise<PositionEvent[]> => {
       `
     })
     let positions: any[] = []
-    if(results.data.data.positionChangeds != undefined){
+    if(results.data.data != undefined || results.data.data.positionChangeds != undefined){
       positions = results.data.data.positionChangeds
     }
     
-    positions.forEach((position: any) => {
-      let leverage = getLeverage(Number(position.positionNotional), Number(position.margin))
-      if(Number(position.unrealizedPnlAfter) != 0){
+    for(let i = 0; i< positions.length;i++){
+      let leverage = getLeverage(Number(positions[i].positionNotional), Number(positions[i].margin))
+      if(Number(positions[i].unrealizedPnlAfter) != 0){
+        let entryPrice = await getEntryPrice(positions[i].timestamp)
         list.push(
           {
-            entryPrice: `${position.positionSizeAfter}`,
-            underlyingPrice: `${position.spotPrice}`,
+            entryPrice: entryPrice,
+            underlyingPrice: `${positions[i].spotPrice}`,
             leverage: `${leverage}`,
-            timestamp: position.timestamp,
-            size: `${position.exchangedPositionSize}`,
+            timestamp: positions[i].timestamp,
+            size: `${positions[i].positionNotional}`,
             type: "Changing",
-            fundingPayment: `${position.fundingPayment}`,
+            fundingPayment: `${positions[i].fundingPayment}`,
           })
       }
               
-    });
+    }
     return list
 }
 
@@ -235,3 +253,61 @@ const removeZeros = (num: string) => {
     return newNum
 }
 
+
+
+interface PriceHistoryDto { 
+  t: Array<number> // timestamps
+  c: Array<number> // close prices
+  o: Array<number> // open prices
+  h: Array<number> // high prices
+  l: Array<number> // low prices
+  v: Array<number> // volume
+  s: string // status
+}
+
+export const getEntryPrice = async (timestamp: string): Promise<string> => { 
+  const symbol = 'Crypto.ETH%2FUSD'
+  // 1, 2, 5, 15, 30, 60, 120, 240, 360, 720, D, 1D, W, 1W, M, 1M. D, W, M are aliases for 1D, 1W, 1M correspondingly. D and 1D mean the same and equal to 1 day. 1W means 1 week. 1M means 1 month.
+  const timeframe = '240'
+  const from = timestamp
+  const to =  `${Number(timestamp) + 86400}`
+  const url = `https://benchmarks.pyth.network/v1/shims/tradingview/history?symbol=${symbol}&resolution=${timeframe}&from=${from}&to=${to}`
+
+  const response = await fetch(url)
+  const data: PriceHistoryDto = await response.json()
+  console.log("data ", data)
+  
+  if (!data.t) {
+    return ''
+  }
+
+  const mappedData = data.t.map((timestamp: number, index: number) => { 
+    const priceInWei = utils.parseUnits(data.c[index].toString(), 18)
+    return {
+      timestamp,
+      price: priceInWei.toString(),
+    }
+  }) 
+
+  let entryPrice = toUsdFormat(mappedData[0].price)
+
+  return entryPrice;
+};
+
+const toUsdFormat = (value: string) => {
+  let price = ''
+  if(value.includes('.')){
+    let sValue = value.split('.')
+    let decimals = sValue[1].slice(0, sValue[1].length-2)
+    price = [sValue[0], decimals].join('')
+    if(price.length < 10){
+      price = price + "0".repeat(10 - price.length)
+    }
+    console.log("price splited ", price)
+  } else {
+    price = utils.formatUnits(value, 12).split('.')[0]
+  }
+  
+  return price;
+
+}
