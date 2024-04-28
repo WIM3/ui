@@ -16,6 +16,7 @@ import { getUpdateData } from "@/v2-integration/getPythtUpdateData";
 import { updatePriceFeed } from "@/v2-integration/updatePriceFeed";
 import { parseEther } from "ethers/lib/utils";
 import { toDecimal } from "@/utils/number";
+import { getPositions } from "@/v2-integration/getPositions";
 
 interface ContractList {
   basicTokenWithMint?: BasicTokenWithMint;
@@ -134,6 +135,7 @@ export const useClearingHouse = () => {
   const { basicTokenWithMint, clearingHouse } = useContractStore(
     (state) => state
   );
+  const { setPositions } = useStore((state) => state.userPositions);
   const { addCloseEvent, removeCloseEvent } = useStore(
     (state) => state.userPositions
   );
@@ -182,6 +184,12 @@ export const useClearingHouse = () => {
           ? `${network.etherscanLink}tx/${confirmed.transactionHash}`
           : undefined,
       });
+      console.log("account ", account)
+      await delay(1000)
+      getPositions(account!).then((position) => {
+        
+        setPositions(position)
+      })
     } catch (error) {
       handleTxError(
         JSON.stringify(error),
@@ -196,6 +204,7 @@ export const useClearingHouse = () => {
 
   const closePosition = async (amm: string, quoteAssetAmountLimit: string, tokenId: string ) => {
     if (!active || !clearingHouse) return;
+    
     
     const baseToken = getToken(tokenId as TokenId)
 
@@ -212,6 +221,7 @@ export const useClearingHouse = () => {
           ? `${network.etherscanLink}tx/${confirmed.transactionHash}`
           : undefined,
       });
+      setPositions([])
     } catch (error) {
       handleTxError(
         JSON.stringify(error),
@@ -233,3 +243,9 @@ export const useClearingHouse = () => {
     loading,
   };
 };
+
+function delay(delay: number) {
+  return new Promise(r => {
+      setTimeout(r, delay);
+  })
+}

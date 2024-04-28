@@ -82,7 +82,6 @@ export const createPositionGridData = (
   return activePositions.map((position) => {
     const pair = getPair(PairId.ETHUSDC);
     const [baseCcy, quoteCcy] = pair.productIds;
-    console.log("position size 1", position.size)
     const size = toTokenUnit(position.size);
     const direction = size.lt(0) ? Directions.Short : Directions.Long;
     const leverage = position.leverage;
@@ -101,8 +100,7 @@ export const createPositionGridData = (
     const liquidationPrice = formatUsdValue(
       openNotional.multipliedBy(new BigNumber(process.env.LIQ_FEE_RATIO!))
     );
-    const profitAndLoss = toTokenUnit(position.unrealizedPnl);
-    console.log("profit and loss ",profitAndLoss.toString())
+    const profitAndLoss = toTokenUnit(position.unrealizedPnl,6);
     const formattedProfitAndLoss = toUSDWithDot(profitAndLoss.toString())
     const pnlROE = profitAndLoss.div(quoteSize).multipliedBy(100);
     const formattedPnlROE = formatNumber(pnlROE.isNaN() ? 0 : pnlROE);
@@ -227,6 +225,10 @@ const toUSD = (value: string) => {
 }
 
 const toUSDWithDot = (value: string) => {
+  if(!value.includes('.')){
+    console.log("profit and loss ", value)
+    return value
+  }
   let sValue = value.split('.')
   let decimals = sValue[1].slice(0, 6)
   return [sValue[0], decimals].join('.')

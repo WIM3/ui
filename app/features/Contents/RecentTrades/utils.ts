@@ -8,10 +8,8 @@ import BigNumber from "bignumber.js";
 
 export const createDataProvider = (recentTrades: PositionEvent[]) => {
   return recentTrades.map(({ size, entryPrice, timestamp }) => {
-    console.log("recent size ", size)
-    const convertedSize = BigNumber(toUSD(size));
+    const convertedSize = BigNumber(size);
     const convertedPrice = BigNumber(entryPrice);
-    console.log("recent entry price ",entryPrice)
     const convertedDateTime = new Date(secondsToMilliseconds(timestamp));
     const direction = convertedSize.lte(0) ? Directions.Short : Directions.Long;
 

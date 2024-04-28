@@ -86,7 +86,7 @@ export const usePriceFeed = () => {
 };
 
 export const useUserPositions = () => {
-  const { setPositions} = useStore((state) => state.userPositions);
+  const { setPositions } = useStore((state) => state.userPositions);
   const state = useStore((state) => state)
   const { feed} = useStore((state) => state.priceHistory);
   
@@ -94,6 +94,7 @@ export const useUserPositions = () => {
     account,
   } = useWeb3React();
   
+
   useEffect(() => {
       
       getPositions(account!).then((position) => {
@@ -102,7 +103,7 @@ export const useUserPositions = () => {
       })
     
      
-  }, [setPositions, account]);
+  }, [ setPositions,account]);
 };
 
 export const useRecentPositions = () => {
