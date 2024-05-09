@@ -81,9 +81,9 @@ export const getPositions = async (trader: string) =>{
       if(visitedAmms.includes(positions[i].amm)){
           continue
       } else {
-        const amm = new ethers.Contract(positions[0].amm, ammAbi,signer)  
+        const amm = new ethers.Contract(positions[i].amm, ammAbi,signer)  
         const fundingRate = await amm.fundingRate()
-        let [size, margin, openNotional, , , ] = await clearingHouse.getPosition(positions[0].amm, trader)
+        let [size, margin, openNotional, , , ] = await clearingHouse.getPosition(positions[i].amm, trader)
         let leverage
         if(margin.d.toString() == '0'){
           leverage = "0"
@@ -91,44 +91,44 @@ export const getPositions = async (trader: string) =>{
           leverage = openNotional.d.div(margin.d)
         }
         let inputSize = await amm.getInputPrice(0, notionalToUsdcDecimals(openNotional))
-        let [notional, unPnL] = await clearingHouse.getPositionNotionalAndUnrealizedPnl(positions[0].amm, trader, 2)
+        let [notional, unPnL] = await clearingHouse.getPositionNotionalAndUnrealizedPnl(positions[i].amm, trader, 2)
         
-        if(isOpenPosition(positions[0].positionSizeAfter, size.toString()) && Number(size.toString()) != 0){
-          if(lastTimeStamp < Number(positions[0].timestamp)){
+        if(isOpenPosition(positions[i].positionSizeAfter, size.toString()) && Number(size.toString()) != 0){
+          if(lastTimeStamp < Number(positions[i].timestamp)){
             let unPrice: number = 0;
-            if(parseInt(positions[0].amm) == parseInt(EthUsdPriceId)){
+            if(parseInt(positions[i].amm) == parseInt(EthUsdPriceId)){
                 unPrice = await fetchCurrentEthUsdPriceFromPythNetwork()    
             }
-            if(parseInt(positions[0].amm) == parseInt(BtcUsdPriceId)){
+            if(parseInt(positions[i].amm) == parseInt(BtcUsdPriceId)){
                 unPrice = await fetchCurrentBtcUsdPriceFromPythNetwork()
             }
         
-            if(parseInt(positions[0].amm) == parseInt(SolUsdPriceId)){
+            if(parseInt(positions[i].amm) == parseInt(SolUsdPriceId)){
                 unPrice = await fetchCurrentSolUsdPriceFromPythNetwork()
             }
             console.log("unprice ", toUsdFormat(unPrice.toString()))
-            let entryPrice = await getEntryPrice(positions[0].timestamp, positions[0].amm)
+            let entryPrice = await getEntryPrice(positions[i].timestamp, positions[i].amm)
             console.log("entry p ", entryPrice)
             
             lastValidPosition = {
-              amm: positions[0].amm,
+              amm: positions[i].amm,
               leverage: leverage.toString(),
               underlyingPrice: `${Number(toUsdFormat(unPrice.toString())) + Number(fundingRate.toString())}`,
-              margin: positions[0].margin,
-              fee: positions[0].fee,
-              trader: positions[0].trader,
-              fundingPayment: positions[0].fundingPayment,
+              margin: positions[i].margin,
+              fee: positions[i].fee,
+              trader: positions[i].trader,
+              fundingPayment: positions[i].fundingPayment,
               active: true,
-              tradingVolume: positions[0].exchangedPositionSize,
+              tradingVolume: positions[i].exchangedPositionSize,
               entryPrice: entryPrice,
-              badDebt: positions[0].badDebt,
+              badDebt: positions[i].badDebt,
               size: size.toString(),
               unrealizedPnl: unPnL.toString(),
-              totalPnlAmount: positions[0].unrealizedPnl,
+              totalPnlAmount: positions[i].unrealizedPnl,
               openNotional: openNotional.toString(),
-              realizedPnl: positions[0].realizedPnl,
-              liquidationPenalty: positions[0].liquidationPenalty,
-              timestamp: positions[0].timestamp,
+              realizedPnl: positions[i].realizedPnl,
+              liquidationPenalty: positions[i].liquidationPenalty,
+              timestamp: positions[i].timestamp,
             };
           }
           
