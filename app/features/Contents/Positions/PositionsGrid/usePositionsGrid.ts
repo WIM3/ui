@@ -16,8 +16,8 @@ export default function usePositionsGrid() {
 
   const handleRowClick = (row: RowProps, column: ColumnProps) => {
     // TODO: We might need to replace "0" with something else later
-    // replace "ETH" with the baseToken symble later
-    column.key === "close" && closePosition(row.amm, "0", "ETH").then(getTokenBalance);
+    // replace "ETH" with the baseToken symbol later
+    column.key === "close" && closePosition(row.amm, "0").then(getTokenBalance);
   };
 
   return {

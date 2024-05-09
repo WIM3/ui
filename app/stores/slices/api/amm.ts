@@ -6,10 +6,11 @@ import {
 } from "@/utils/formatters";
 import { AppState, CustomStateCreator } from "../../types";
 import { handleError } from "../slices.utils";
-import { EthUsdPriceId, isEthUsPriceFeed } from "@/v2-integration/utils";
+import { BtcUsdPriceId, EthUsdPriceId, SolUsdPriceId, isEthUsPriceFeed } from "@/v2-integration/utils";
 import { fetchPriceEthUsdHistory } from "@/v2-integration/fetchPriceHistory";
-import { fetchCurrentEthUsdPriceFromPythNetwork } from "@/v2-integration/fetchTokenPrice";
+import { fetchCurrentBtcUsdPriceFromPythNetwork, fetchCurrentEthUsdPriceFromPythNetwork } from "@/v2-integration/fetchTokenPrice";
 import { secondsToMilliseconds } from "date-fns";
+import { getInitialState, useStore } from "@/stores/root";
 
 const getDefaultData = () => ({
   id: "",
@@ -29,20 +30,26 @@ const getDefaultData = () => ({
   quoteAssetReserve: "",
 });
 
+
+
 export interface AmmSlice {
   amm: Amm & {
-    setAmmInfo: () => void;
+    setAmmInfo: (ammAddr: string) => void;
     clear: () => void;
   };
 }
 
-export const createAmmSlice: CustomStateCreator<AmmSlice> = (set, get) => ({
+
+export const createAmmSlice: CustomStateCreator<AmmSlice> = (set, get) => (
+  
+  {
   amm: {
     ...getDefaultData(),
 
-    setAmmInfo: () => {
+    setAmmInfo: (ammAddr: string) => {
       let amm: Amm;
-      fetchCurrentEthUsdPriceFromPythNetwork().then((ethUsdPrice: number) => { 
+      if(parseInt(ammAddr) == parseInt(EthUsdPriceId)){
+        fetchCurrentEthUsdPriceFromPythNetwork().then((ethUsdPrice: number) => { 
           amm = {
             baseAssetReserve: "0",
             dataFeedId: EthUsdPriceId,
@@ -65,7 +72,62 @@ export const createAmmSlice: CustomStateCreator<AmmSlice> = (set, get) => ({
 
             state.amm = { ...state.amm, ...amm };
           });
-      });
+      });  
+    }
+    if(parseInt(ammAddr) == parseInt(BtcUsdPriceId)){
+      fetchCurrentBtcUsdPriceFromPythNetwork().then((btcUsdPrice: number) => { 
+        amm = {
+          baseAssetReserve: "0",
+          dataFeedId: BtcUsdPriceId,
+          fundingBufferPeriod: 3600,
+          fundingPeriod: 3600,
+          fundingRate: "0",
+          id: BtcUsdPriceId,
+          lastFunding: 0,
+          nextFunding: 0,
+          price: btcUsdPrice,
+          priceFeedKey: BtcUsdPriceId,
+          quoteAsset: "USD",
+          quoteAssetReserve: "0",
+          tradeLimitRatio: "0",
+          tradingVolume: "0",
+          underlyingPrice: btcUsdPrice.toString(),
+        };
+
+        set(function setAmmInfo(state: AppState) {
+
+          state.amm = { ...state.amm, ...amm };
+        });
+    });
+    }
+
+    if(parseInt(ammAddr) == parseInt(SolUsdPriceId)){
+      fetchCurrentBtcUsdPriceFromPythNetwork().then((solUsdPrice: number) => { 
+        amm = {
+          baseAssetReserve: "0",
+          dataFeedId: SolUsdPriceId,
+          fundingBufferPeriod: 3600,
+          fundingPeriod: 3600,
+          fundingRate: "0",
+          id: SolUsdPriceId,
+          lastFunding: 0,
+          nextFunding: 0,
+          price: solUsdPrice,
+          priceFeedKey: SolUsdPriceId,
+          quoteAsset: "USD",
+          quoteAssetReserve: "0",
+          tradeLimitRatio: "0",
+          tradingVolume: "0",
+          underlyingPrice: solUsdPrice.toString(),
+        };
+
+        set(function setAmmInfo(state: AppState) {
+
+          state.amm = { ...state.amm, ...amm };
+        });
+    });
+    }
+      
       
       
     },

@@ -9,6 +9,8 @@ import { providers } from "ethers";
 import { Markets, PriceUpdate } from "@/types/api";
 import { useWeb3React } from "@web3-react/core";
 import { getHistoryData } from "@/stores/slices/api/priceHistory";
+import { BtcUsdPriceId, EthUsdPriceId, SolUsdPriceId } from "@/v2-integration/utils";
+import { fetchPriceBtcUsdHistory, fetchPriceEthUsdHistory, fetchPriceSolUsdHistory } from "@/v2-integration/fetchPriceHistory";
 
 interface SocketStore {
   connected: boolean;
@@ -40,9 +42,9 @@ export const useMarkets = () => {
   const { setMarkets } = useStore((state) => state.markets);
   const markets: Markets = {
     Crypto: {
-      ETHUSDC: "0x0708325268dF9F66270F1401206434524814508b",
-      BTCUSDC: "0x6b91c20cb2F01843E07F337085e7f6cB71DD103f",
-      SOLUSDC: "0x883bB1ABF2B9011456e797CE1aa9384B4177F4A6",
+      ETHUSDC: "0x9C83e74e25B12273157232319956b30cf090b658",
+      BTCUSDC: "0x56f36E178F6552E8ef5f0cC351e14439C4b8565d",
+      SOLUSDC: "0x0CEA0f26115D07C101ebBa0fe23812a5C1354Ac3",
       AVAXUSDC: "0x2e49aCCF96Fa08090aE1eEa3DA246803bd95aEC9",
     },
     SPPlatts: {
@@ -68,21 +70,40 @@ export const useMarkets = () => {
 // Subgraph fetch AMMInfo from the blockchain
 // To put that in Subgraph we need to emit the ADDPOOL event from MarketRegistry.sol
 export const useAmmInfo = () => {
-  const { setAmmInfo } = useStore((state) => state.amm);
-  
+  const { setAmmInfo, } = useStore((state) => state.amm);
+  const { amm } = useStore((state) => state.markets);
+
   useEffect(() => {
-    return setAmmInfo()
-  }, [setAmmInfo]);
+    return setAmmInfo(amm)
+  }, [setAmmInfo, amm]);
 };
 
 export const usePriceFeed = () => {
+  const { amm } = useStore((state) => state.markets);
   const { setPriceFeed, setReady } = useStore((state) => state.priceHistory);
+  
 
   useEffect(() => {
     setReady(false);
-    return setPriceFeed()
-      
-  }, [setPriceFeed]);
+    if(parseInt(amm) == parseInt(EthUsdPriceId)){
+        
+        fetchPriceEthUsdHistory().then((data) => {
+          return setPriceFeed(data)
+        })
+        
+    }
+    if(parseInt(amm) == parseInt(BtcUsdPriceId)){
+        fetchPriceBtcUsdHistory().then((data) => {
+          return setPriceFeed(data)
+        })
+    }
+
+    if(parseInt(amm) == parseInt(SolUsdPriceId)){
+        fetchPriceSolUsdHistory().then((data) => {
+          return setPriceFeed(data)
+        })
+    }
+  }, [setPriceFeed, amm]);
 };
 
 export const useUserPositions = () => {
@@ -92,29 +113,40 @@ export const useUserPositions = () => {
   
   const {
     account,
+    chainId
   } = useWeb3React();
   
 
   useEffect(() => {
-      
-      getPositions(account!).then((position) => {
+      console.log("id ",chainId)
+      if(chainId! === 11155420){
         
-        setPositions(position);
-      })
-    
-     
-  }, [ setPositions,account]);
+        getPositions(account!).then((position) => {
+        
+          setPositions(position);
+        })
+      }
+      
+  }, [ setPositions,account, chainId]);
 };
 
 export const useRecentPositions = () => {
+  const { amm } = useStore((state) => state.markets);
   const { setPositions, setReady } = useStore((state) => state.recentPositions);
+  const {
+    chainId
+  } = useWeb3React();
   
+
   useEffect(() => {
-    setReady(false);
-    getRecentPositions().then((positions)=> {
-      return setPositions(positions)
-    })
-  }, [setPositions]);
+    
+    if(chainId! === 11155420){
+      setReady(false);
+      getRecentPositions(amm).then((positions)=> {
+        return setPositions(positions)
+      })
+    }
+  }, [setPositions, chainId, amm]);
 };
 
 

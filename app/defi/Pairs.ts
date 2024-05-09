@@ -12,11 +12,7 @@ export const PAIRS: { [key in PairId]: Pair } = {
     marketId: MarketId.Crypto,
     productIds: [TokenId.ETH, TokenId.USDC],
   },
-  [PairId.AVAXUSDC]: {
-    id: PairId.AVAXUSDC,
-    marketId: MarketId.Crypto,
-    productIds: [TokenId.AVAX, TokenId.USDC],
-  },
+  
   [PairId.CHAOSUSDC]: {
     id: PairId.CHAOSUSDC,
     marketId: MarketId.Crypto,

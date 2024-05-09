@@ -1,6 +1,7 @@
 import BigNumber from "bignumber.js";
 
 import { toFixedNumber } from "@/utils/formatters";
+import { BtcUsdPriceId } from "@/v2-integration/utils";
 
 export const calculateBaseAmount = (
   amount: string,
@@ -24,13 +25,16 @@ export const calculateQuoteAmount = (amount: string, balance: BigNumber) => {
 export const convertQuoteToBaseAmount = (
   quoteAmount: string,
   balance: BigNumber,
-  exchangeRate: BigNumber | number
+  exchangeRate: BigNumber | number,
+  amm: string
 ) => {
   const convertedAmount = new BigNumber(quoteAmount).dividedBy(exchangeRate);
+  console.log("exchage rate ", exchangeRate.toString())
   console.log("conv amount ", convertedAmount.toString())
   const maxAmount = balance.dividedBy(exchangeRate);
   console.log("max amount ", maxAmount.toString())
-  return BigNumber.min(convertedAmount, maxAmount).toString();
+
+  return BigNumber.min(convertedAmount, maxAmount).toFixed(parseInt(amm) == parseInt(BtcUsdPriceId)? 8: 18).toString();
 };
 
 export const convertBaseToQuoteAmount = (

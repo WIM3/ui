@@ -14,7 +14,7 @@ interface PriceHistoryProps {
 
 export interface PriceHistorySlice {
   priceHistory: PriceHistoryProps & {
-    setPriceFeed: () => void;
+    setPriceFeed: (data: PriceUpdate[]) => void;
     setReady: (ready: boolean) => void;
     clear: () => void;
   };
@@ -29,14 +29,13 @@ export const createPriceHistorySlice: CustomStateCreator<PriceHistorySlice> = (
     feed: [],
     ready: false,
 
-    setPriceFeed: () => {
-      fetchPriceEthUsdHistory().then((data) => { 
-          set(function setPriceFeed(state: AppState) {
-            const [latest] = data.slice(-1);
-            state.priceHistory.latest = latest?.price || "0";
-            state.priceHistory.feed = data;
-            state.priceHistory.ready = true;
-          });
+    setPriceFeed: (data: PriceUpdate[]) => {
+      set(function setPriceFeed(state: AppState) {
+          const [latest] = data.slice(-1);
+          state.priceHistory.latest = latest?.price || "0";
+          state.priceHistory.feed = data;
+          state.priceHistory.ready = true;
+          console.log("r ", state.priceHistory.ready)
       });
     },
 

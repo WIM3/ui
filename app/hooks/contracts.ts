@@ -144,6 +144,8 @@ export const useClearingHouse = () => {
     (state) => state.markets
   );
 
+  const { amm } = useStore((state) => state.markets);
+
 
   const gasLimit = gasAmount(chainId);
   const network = useStore(getSelectedNetwork);
@@ -151,7 +153,7 @@ export const useClearingHouse = () => {
   const signer = provider.getSigner();
  
   const openPosition = async (
-    amm: string,
+    amm1: string,
     side: number,
     quoteAssetAmount: string,
     leverage: number,
@@ -202,11 +204,9 @@ export const useClearingHouse = () => {
     }
   };
 
-  const closePosition = async (amm: string, quoteAssetAmountLimit: string, tokenId: string ) => {
+  const closePosition = async (amm: string, quoteAssetAmountLimit: string) => {
     if (!active || !clearingHouse) return;
     
-    
-    const baseToken = getToken(tokenId as TokenId)
 
     setLoading(true);
     addCloseEvent(amm);

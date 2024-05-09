@@ -26,6 +26,7 @@ import {
   UserPositionData,
   UserPositionEvent,
 } from "./userPositions.types";
+import { BtcUsdPriceId, EthUsdPriceId, SolUsdPriceId } from "@/v2-integration/utils";
 
 export const transformPositions = (
   positions: Position[],
@@ -80,7 +81,12 @@ export const createPositionGridData = (
   });
 
   return activePositions.map((position) => {
-    const pair = getPair(PairId.ETHUSDC);
+    let pair = getPair(PairId.ETHUSDC);;
+    if(parseInt(position.amm) == parseInt(BtcUsdPriceId)){
+        pair = getPair(PairId.BTCUSDC);
+    } else if(parseInt(position.amm) == parseInt(SolUsdPriceId)){
+        pair = getPair(PairId.SOLUSDC);
+    }
     const [baseCcy, quoteCcy] = pair.productIds;
     const size = toTokenUnit(position.size);
     const direction = size.lt(0) ? Directions.Short : Directions.Long;
@@ -101,6 +107,7 @@ export const createPositionGridData = (
       openNotional.multipliedBy(new BigNumber(process.env.LIQ_FEE_RATIO!))
     );
     const profitAndLoss = toTokenUnit(position.unrealizedPnl,6);
+    console.log("pnl ", profitAndLoss.toString())
     const formattedProfitAndLoss = toUSDWithDot(profitAndLoss.toString())
     const pnlROE = profitAndLoss.div(quoteSize).multipliedBy(100);
     const formattedPnlROE = formatNumber(pnlROE.isNaN() ? 0 : pnlROE);
@@ -122,7 +129,7 @@ export const createPositionGridData = (
       entryPrice: toUSD(entryPrice.toString()),
       markPrice: toUSD(markPrice.toString()),
       liquidationPrice,
-      profitAndLoss: `${formattedProfitAndLoss} (${formattedPnlROE}%)`,
+      profitAndLoss: `${formattedProfitAndLoss} (${getPercent(formattedPnlROE)}%)`,
       originalProfitAndLoss: profitAndLoss,
       isInProfit: false,
       isClosing: closeEvents.includes(position.amm),
@@ -216,11 +223,12 @@ export const createNotificationHistoryData = (
 };
 
 const toUSD = (value: string) => {
-  let decimals = value.slice(value.length - 6, value.length)
+  console.log("value ", value)
+  let decimals = value.slice(value.length - 2, value.length)
   let units = value.slice(0, value.length - 6)
 
-  let beforeComma = units[0]
-  let afterComma = units.slice(1, units.length)
+  let beforeComma = units.slice(0,units.length > 4?2:1)
+  let afterComma = units.slice(units.length > 4?2:1, units.length)
   return ['$ ',[[beforeComma,afterComma].join(','),decimals].join('.')].join('')
 }
 
@@ -230,6 +238,16 @@ const toUSDWithDot = (value: string) => {
     return value
   }
   let sValue = value.split('.')
-  let decimals = sValue[1].slice(0, 6)
-  return [sValue[0], decimals].join('.')
+  let nv = new BigNumber([sValue[0], sValue[1]].join('')).div(10**12).toFixed(0).toString()
+  
+  console.log("nv ",nv.toString())
+  let amount = nv.slice(0, nv.length-6)
+  let decimals = nv.slice(nv.length-6, nv.length)
+  return [amount, decimals].join('.')
+}
+
+const getPercent = (value: string) => {
+    let sValue = value.split(',')
+    let nValue = [sValue[0], sValue[1].slice(0, 2)].join('.')
+    return nValue
 }

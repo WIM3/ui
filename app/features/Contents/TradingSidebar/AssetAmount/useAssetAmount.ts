@@ -14,9 +14,11 @@ import {
   convertBaseToQuoteAmount,
   convertQuoteToBaseAmount,
 } from "./helpers";
+import { BtcUsdPriceId } from "@/v2-integration/utils";
 
 export default function useAssetAmount() {
   const { pairId } = useStore((state) => state.markets);
+  
   const {
     balance: balanceValue,
     amounts: { base, baseValue, quote, quoteValue },
@@ -46,21 +48,24 @@ export default function useAssetAmount() {
     placeholder: "0",
   };
 
+  const { amm } = useStore((state) => state.markets);
   // calculate quote amount from base amount and mark price
   // TODO: the terms of base/quote used in the application are the opposite, this needs to be fixed
   useEffect(() => {
+    
     if (baseValue.eq(0)) return;
 
-    const baseAmount = toFixedNumber(quoteValue.dividedBy(exchangeRate));
+    const baseAmount = toFixedNumber(quoteValue.dividedBy(exchangeRate), parseInt(amm) == parseInt(BtcUsdPriceId) ? 8:18);
 
-    setAmounts(utils.formatUnits(BigNumber(baseAmount).toFixed(0),18), quote);
+    setAmounts(utils.formatUnits(isNaN(Number(baseAmount)) || baseAmount == ""? '0': baseAmount,parseInt(amm) == parseInt(BtcUsdPriceId) ? 8:18), quote);
   }, [underlyingPrice]);
 
   const handleMaxClick = () => {
-    const baseAmount = toFixedNumber(balance.dividedBy(exchangeRate));
+    const baseAmount = toFixedNumber(balance.dividedBy(exchangeRate), parseInt(amm) == parseInt(BtcUsdPriceId) ? 8:18);
     const quoteAmount = toFixedNumber(balance);
+    
 
-    setAmounts(utils.formatUnits(baseAmount,18), quoteAmount);
+    setAmounts(utils.formatUnits(isNaN(Number(baseAmount))? '0': baseAmount,parseInt(amm) == parseInt(BtcUsdPriceId) ? 8:18), quoteAmount);
   };
 
   const handleBaseAmountChange = ({
@@ -90,7 +95,8 @@ export default function useAssetAmount() {
     const baseAmount = convertQuoteToBaseAmount(
       quoteAmount,
       balance,
-      exchangeRate
+      exchangeRate,
+      amm
     );
     setAmounts(baseAmount, quoteAmount);
   };

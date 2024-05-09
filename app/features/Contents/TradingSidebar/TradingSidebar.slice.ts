@@ -125,6 +125,7 @@ export const getPriceDetails = (state: AppState) => {
   const impact = new BigNumber(100).minus(
     entryPrice.div(quoteAssetReserve.div(baseAssetReserve)).multipliedBy(100)
   );
+  
   const liquidationPrice = state.tradingSidebar.amounts.quoteValue.multipliedBy(
     process.env.LIQ_FEE_RATIO!
   );

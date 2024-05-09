@@ -3,7 +3,6 @@ export enum TokenId {
   USDC = "USDC",
   ETH = "ETH",
   MATIC = "MATIC",
-  AVAX = "AVAX",
   MOVR = "MOVR",
   FTM = "FTM",
   KSM = "KSM",
@@ -138,7 +137,6 @@ export type Product =
 export enum PairId {
   BTCUSDC = "BTCUSDC",
   ETHUSDC = "ETHUSDC",
-  AVAXUSDC = "AVAXUSDC",
   FTMUSDC = "FTMUSDC",
   MOVRUSDC = "MOVRUSDC",
   CHAOSUSDC = "CHAOSUSDC",

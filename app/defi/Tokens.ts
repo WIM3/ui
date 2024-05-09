@@ -36,13 +36,6 @@ export const TOKENS: { [key in TokenId]: Token } = {
     name: "Matic",
     address: "",
   },
-  [TokenId.AVAX]: {
-    id: TokenId.AVAX,
-    icon: "/tokens/avalanche.svg",
-    symbol: "AVAX",
-    name: "Avalanche",
-    address: "",
-  },
   [TokenId.FTM]: {
     id: TokenId.FTM,
     icon: "/tokens/fantom.svg",
