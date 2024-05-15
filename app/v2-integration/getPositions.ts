@@ -91,7 +91,8 @@ export const getPositions = async (trader: string) =>{
           leverage = openNotional.d.div(margin.d)
         }
         let inputSize = await amm.getInputPrice(0, notionalToUsdcDecimals(openNotional))
-        let [notional, unPnL] = await clearingHouse.getPositionNotionalAndUnrealizedPnl(positions[i].amm, trader, 2)
+        let [notional, unPnL] = await clearingHouse.getPositionNotionalAndUnrealizedPnl(positions[i].amm, trader, 1)
+        console.log("pnl ", unPnL.toString())
         
         if(isOpenPosition(positions[i].positionSizeAfter, size.toString()) && Number(size.toString()) != 0){
           if(lastTimeStamp < Number(positions[i].timestamp)){
@@ -106,9 +107,7 @@ export const getPositions = async (trader: string) =>{
             if(parseInt(positions[i].amm) == parseInt(SolUsdPriceId)){
                 unPrice = await fetchCurrentSolUsdPriceFromPythNetwork()
             }
-            console.log("unprice ", toUsdFormat(unPrice.toString()))
             let entryPrice = await getEntryPrice(positions[i].timestamp, positions[i].amm)
-            console.log("entry p ", entryPrice)
             
             lastValidPosition = {
               amm: positions[i].amm,

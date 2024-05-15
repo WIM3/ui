@@ -72,38 +72,49 @@ export const useMarkets = () => {
 export const useAmmInfo = () => {
   const { setAmmInfo, } = useStore((state) => state.amm);
   const { amm } = useStore((state) => state.markets);
+  const { setPriceFeed, setReady, latest, feed } = useStore((state) => state.priceHistory);
+  const {
+    account,
+    chainId
+  } = useWeb3React();
 
   useEffect(() => {
-    return setAmmInfo(amm)
-  }, [setAmmInfo, amm]);
+    if(account != null && account != undefined){
+      return setAmmInfo(amm, account!)
+    }
+    
+  }, [setAmmInfo, amm, account,feed]);
 };
 
 export const usePriceFeed = () => {
   const { amm } = useStore((state) => state.markets);
-  const { setPriceFeed, setReady } = useStore((state) => state.priceHistory);
-  
-
+  const { setPriceFeed, setReady, latest, feed } = useStore((state) => state.priceHistory);
+  let priceData: PriceUpdate[] = feed
   useEffect(() => {
     setReady(false);
+    
     if(parseInt(amm) == parseInt(EthUsdPriceId)){
         
         fetchPriceEthUsdHistory().then((data) => {
+          priceData = data
           return setPriceFeed(data)
         })
         
     }
     if(parseInt(amm) == parseInt(BtcUsdPriceId)){
         fetchPriceBtcUsdHistory().then((data) => {
+          priceData = data
           return setPriceFeed(data)
         })
     }
 
     if(parseInt(amm) == parseInt(SolUsdPriceId)){
         fetchPriceSolUsdHistory().then((data) => {
+          priceData = data
           return setPriceFeed(data)
         })
     }
-  }, [setPriceFeed, amm]);
+  }, [setPriceFeed,amm, priceData]);
 };
 
 export const useUserPositions = () => {

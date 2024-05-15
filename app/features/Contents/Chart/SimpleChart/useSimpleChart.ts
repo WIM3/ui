@@ -24,6 +24,7 @@ export default function useSimpleChart(initialData: any[], update: any[]) {
   const { chart, lineSeries, setChart, setLineSeries } = useChartStore();
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
+
   useEffect(() => {
     if (!initialData.length || !chartContainerRef.current) return;
 
@@ -55,14 +56,13 @@ export default function useSimpleChart(initialData: any[], update: any[]) {
       window.removeEventListener("resize", handleResize);
       chartInstance.remove();
     };
-  }, [initialData]);
+  }, [initialData, update]);
 
   useEffect(() => {
     if (!chart || !initialData.length || !update.length) return;
 
     update.forEach((tickData) => lineSeries?.update(tickData));
   }, [initialData, update]);
-
   return {
     chartContainerRef,
   };

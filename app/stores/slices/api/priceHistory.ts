@@ -35,7 +35,6 @@ export const createPriceHistorySlice: CustomStateCreator<PriceHistorySlice> = (
           state.priceHistory.latest = latest?.price || "0";
           state.priceHistory.feed = data;
           state.priceHistory.ready = true;
-          console.log("r ", state.priceHistory.ready)
       });
     },
 
@@ -76,6 +75,7 @@ export const getLatestPriceInfo = (state: AppState) => {
     ? calculateChangePercentage(lastPrice, penultimatePrice).toNumber()
     : 0;
 
+    
   return {
     lastPrice,
     change,

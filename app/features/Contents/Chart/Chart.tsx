@@ -25,7 +25,7 @@ export const Chart = () => {
         price={latestPriceInfo.lastPrice}
         change={latestPriceInfo.change}
         percentage={latestPriceInfo.percentageChange}
-        loading={!ready}
+        loading={false}
       />
     </Box>
   );

@@ -94,6 +94,7 @@ export const createPositionGridData = (
     const entryPrice = new BigNumber(position.entryPrice);
     const openNotional = toTokenUnit(position.openNotional);
     const markPrice = position.underlyingPrice;
+    console.log("mark price ", markPrice)
     const timestamp = secondsToMilliseconds(position.timestamp);
     const baseSize = formatNumber(size.abs(), {
       productId: baseCcy,
@@ -107,10 +108,10 @@ export const createPositionGridData = (
       openNotional.multipliedBy(new BigNumber(process.env.LIQ_FEE_RATIO!))
     );
     const profitAndLoss = toTokenUnit(position.unrealizedPnl,6);
-    console.log("pnl ", profitAndLoss.toString())
     const formattedProfitAndLoss = toUSDWithDot(profitAndLoss.toString())
     const pnlROE = profitAndLoss.div(quoteSize).multipliedBy(100);
-    const formattedPnlROE = formatNumber(pnlROE.isNaN() ? 0 : pnlROE);
+    const formattedPnlROE = formatNumber(pnlROE.isNaN() ? 0 : pnlROE,{base:4});
+    console.log("pnl roe ", pnlROE.toString())
 
     return {
       pair,
@@ -126,10 +127,10 @@ export const createPositionGridData = (
       size: `${baseSize} (${formattedQuoteSize})`,
       date: format(timestamp, "dd/MM/yyyy"),
       time: format(timestamp, "HH:mm:ss"),
-      entryPrice: toUSD(entryPrice.toString()),
-      markPrice: toUSD(markPrice.toString()),
+      entryPrice: toUSD(entryPrice.toString(), pair == getPair(PairId.BTCUSDC)? true: false),
+      markPrice: toUSD(markPrice, pair == getPair(PairId.BTCUSDC)? true: false),
       liquidationPrice,
-      profitAndLoss: `${formattedProfitAndLoss} (${getPercent(formattedPnlROE)}%)`,
+      profitAndLoss: `${formattedProfitAndLoss} (${getPercent(pnlROE.toString())}%)`,
       originalProfitAndLoss: profitAndLoss,
       isInProfit: false,
       isClosing: closeEvents.includes(position.amm),
@@ -222,9 +223,12 @@ export const createNotificationHistoryData = (
   });
 };
 
-const toUSD = (value: string) => {
-  console.log("value ", value)
+const toUSD = (value: string, isBtc: boolean) => {
+  if(isBtc && value.length < 11){
+    value = value + "0".repeat(11 - value.length)
+  }
   let decimals = value.slice(value.length - 2, value.length)
+
   let units = value.slice(0, value.length - 6)
 
   let beforeComma = units.slice(0,units.length > 4?2:1)
@@ -234,20 +238,21 @@ const toUSD = (value: string) => {
 
 const toUSDWithDot = (value: string) => {
   if(!value.includes('.')){
-    console.log("profit and loss ", value)
     return value
   }
   let sValue = value.split('.')
   let nv = new BigNumber([sValue[0], sValue[1]].join('')).div(10**12).toFixed(0).toString()
   
-  console.log("nv ",nv.toString())
   let amount = nv.slice(0, nv.length-6)
   let decimals = nv.slice(nv.length-6, nv.length)
   return [amount, decimals].join('.')
 }
 
 const getPercent = (value: string) => {
+    if(!value.includes(',')){
+      return value
+    }
     let sValue = value.split(',')
-    let nValue = [sValue[0], sValue[1].slice(0, 2)].join('.')
+    let nValue = [sValue[0], sValue[1].slice(0, 3)].join('.')
     return nValue
 }
