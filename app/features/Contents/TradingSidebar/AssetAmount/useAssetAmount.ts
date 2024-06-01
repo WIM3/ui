@@ -54,10 +54,11 @@ export default function useAssetAmount() {
   useEffect(() => {
     
     if (baseValue.eq(0)) return;
-
-    const baseAmount = toFixedNumber(quoteValue.dividedBy(exchangeRate), parseInt(amm) == parseInt(BtcUsdPriceId) ? 8:18);
-
-    setAmounts(utils.formatUnits(isNaN(Number(baseAmount)) || baseAmount == ""? '0': baseAmount,parseInt(amm) == parseInt(BtcUsdPriceId) ? 8:18), quote);
+    console.log("quote ", quoteValue.toString())
+    console.log("exchange rate ", exchangeRate.toString())
+    const baseAmount = quoteValue.dividedBy(exchangeRate).toString();
+    console.log("base ",baseAmount)
+    setAmounts(isNaN(Number(baseAmount)) || baseAmount == ""? '0': parseInt(amm) == parseInt(BtcUsdPriceId) ? btcFormat(baseAmount): baseAmount, quote);
   }, [underlyingPrice]);
 
   const handleMaxClick = () => {
@@ -124,4 +125,9 @@ const formatPrice = (price: string) =>{
       splitPrice[1] = splitPrice[1] + '0'.repeat(6 - splitPrice[1].length)
     }
     return [splitPrice[0], splitPrice[1]].join('.')
+}
+
+const btcFormat = (value: string) => {
+    let sValue = value.split('.')
+    return [sValue[0], sValue[1].slice(0,8)].join('.')
 }

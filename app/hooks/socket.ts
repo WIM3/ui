@@ -79,10 +79,11 @@ export const useAmmInfo = () => {
   } = useWeb3React();
 
   useEffect(() => {
-    if(account != null && account != undefined){
-      return setAmmInfo(amm, account!)
+    if(chainId! === 11155420){
+      if(account != null && account != undefined){
+        return setAmmInfo(amm, account!)
+      }
     }
-    
   }, [setAmmInfo, amm, account,feed]);
 };
 
