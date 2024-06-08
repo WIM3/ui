@@ -13,7 +13,7 @@ const provider = new providers.Web3Provider(window.ethereum as any);
 const createStore = () => {
   const store = getInitialState();
 
-  getRecentPositions().then((positions)=> {
+  getRecentPositions(store.markets.amm).then((positions)=> {
     store.recentPositions.list = positions
   })
   

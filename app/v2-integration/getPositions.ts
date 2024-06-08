@@ -93,7 +93,7 @@ export const getPositions = async (trader: string) =>{
         let inputSize = await amm.getInputPrice(0, notionalToUsdcDecimals(openNotional))
         let [notional, unPnL] = await clearingHouse.getPositionNotionalAndUnrealizedPnl(positions[i].amm, trader, 1)
         console.log("pnl ", unPnL.toString())
-        
+        let lastValidPosition = undefined
         if(isOpenPosition(positions[i].positionSizeAfter, size.toString()) && Number(size.toString()) != 0){
           if(lastTimeStamp < Number(positions[i].timestamp)){
             let unPrice: number = 0;
@@ -108,11 +108,12 @@ export const getPositions = async (trader: string) =>{
                 unPrice = await fetchCurrentSolUsdPriceFromPythNetwork()
             }
             let entryPrice = await getEntryPrice(positions[i].timestamp, positions[i].amm)
-            
+            console.log("price oracle ", unPrice.toString())
+            console.log("funding rate ", fundingRate.toString())
             lastValidPosition = {
               amm: positions[i].amm,
               leverage: leverage.toString(),
-              underlyingPrice: `${Number(toUsdFormat(unPrice.toString())) + Number(fundingRate.toString())}`,
+              underlyingPrice: `${Number(toUsdFormat(unPrice.toString())) + Number(fundingRate.div(10**12).toString())}`,
               margin: positions[i].margin,
               fee: positions[i].fee,
               trader: positions[i].trader,
@@ -140,12 +141,12 @@ export const getPositions = async (trader: string) =>{
             position: lastValidPosition,
             history: []
           })
-          return positonArr 
+           
         }    
       }
     }
     
-    return []
+    return positonArr
           
 }
 
@@ -185,6 +186,17 @@ export const getRecentPositions = async (amm: string): Promise<PositionEvent[]> 
     const provider = new ethers.providers.Web3Provider((window as any).ethereum)
     let sPositions: any[] = []
     let traders: any[] = [] 
+    let unPrice: number = 0;
+    if(parseInt(amm) == parseInt(EthUsdPriceId)){
+        unPrice = await fetchCurrentEthUsdPriceFromPythNetwork()    
+    }
+    if(parseInt(amm) == parseInt(BtcUsdPriceId)){
+        unPrice = await fetchCurrentBtcUsdPriceFromPythNetwork()
+    }
+
+    if(parseInt(amm) == parseInt(SolUsdPriceId)){
+        unPrice = await fetchCurrentSolUsdPriceFromPythNetwork()
+    }
     for(let i = 0;i < positions.length;i++){
         if(traders.includes(positions[i].trader)){
           continue
@@ -196,18 +208,19 @@ export const getRecentPositions = async (amm: string): Promise<PositionEvent[]> 
     for(let i = 0; i< sPositions.length;i++){
       const signer = provider.getSigner(sPositions[i].trader)
       const clearingHouse = new ethers.Contract(process.env.CLEARING_HOUSE!, clearingHouseAbi, signer)
-      let [size, margin, openNotional, , , ] = await clearingHouse.getPosition(sPositions[i].amm, sPositions[i].trader)
+      let [size, margin, openNotional, , , ] = await clearingHouse.getPosition(amm, sPositions[i].trader)
+      
       if(margin.d.toString() == '0'){
         continue
       }
       let leverage = openNotional.d.div(margin.d)
       let [notional, unPnL] = await clearingHouse.getPositionNotionalAndUnrealizedPnl(sPositions[i].amm, sPositions[i].trader, 2)
-      if(isOpenPosition(sPositions[i].positionSizeAfter, size.toString()) && Number(size.toString()) != 0 && sPositions[i].amm == amm){
-        let entryPrice = await getEntryPrice(sPositions[i].timestamp, sPositions[i].amm)
+      if(Number(size.toString()) != 0){
+        let entryPrice = await getEntryPrice(sPositions[i].timestamp, amm)
         list.push(
           {
             entryPrice: entryPrice,
-            underlyingPrice: `${sPositions[i].spotPrice}`,
+            underlyingPrice: `${Number(toUsdFormat(unPrice.toString()))}`,
             leverage: leverage.toString(),
             timestamp: sPositions[i].timestamp,
             size: openNotional.d.div(10**12).toString(),
@@ -338,3 +351,4 @@ const notionalToUsdcDecimals = (value: string) => {
   let sValue = value.split('.')
   return toDecimal([sValue[0], sValue[1].slice(0,6)].join('.'), 6)
 }
+

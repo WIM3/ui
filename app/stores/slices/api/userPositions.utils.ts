@@ -94,7 +94,6 @@ export const createPositionGridData = (
     const entryPrice = new BigNumber(position.entryPrice);
     const openNotional = toTokenUnit(position.openNotional);
     const markPrice = position.underlyingPrice;
-    console.log("mark price ", markPrice)
     const timestamp = secondsToMilliseconds(position.timestamp);
     const baseSize = formatNumber(size.abs(), {
       productId: baseCcy,
@@ -111,7 +110,6 @@ export const createPositionGridData = (
     const formattedProfitAndLoss = toUSDWithDot(profitAndLoss.toString())
     const pnlROE = profitAndLoss.div(quoteSize).multipliedBy(100);
     const formattedPnlROE = formatNumber(pnlROE.isNaN() ? 0 : pnlROE,{base:4});
-    console.log("pnl roe ", pnlROE.toString())
 
     return {
       pair,
@@ -250,9 +248,16 @@ const toUSDWithDot = (value: string) => {
 
 const getPercent = (value: string) => {
     if(!value.includes(',')){
-      return value
+      let sValue = value.split('.')
+      if(Number(value.slice(0,2)) < 0){
+        console.log("value ", value.slice(0,3))
+        return [sValue[0].slice(0,3),sValue[1].slice(0,2)].join('.')
+      }
+      console.log("value ", value.slice(0,3))
+      return [sValue[0].slice(0,2),sValue[1].slice(0,2)].join('.')
     }
-    let sValue = value.split(',')
-    let nValue = [sValue[0], sValue[1].slice(0, 3)].join('.')
+    let sValue = value.split('.')
+    console.log("value ", sValue.slice(0,3))
+    let nValue = [Number(sValue.slice(0,2)) < 0? sValue[0].slice(0,3): sValue[0].slice(0,2), sValue[1].slice(0, 3)].join('.')
     return nValue
 }
