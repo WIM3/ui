@@ -192,7 +192,7 @@ export const createNotificationHistoryData = (
       historyEntry.type as OriginalPositionChangeStatuses
     );
     const isOpen = status === PositionChangeStatuses.Open;
-
+      console.log("test")
     const commonProps = {
       id: timestamp + pair.id,
       productIds: pair.productIds,
