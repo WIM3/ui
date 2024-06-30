@@ -134,7 +134,7 @@ export const useUserPositions = () => {
       if(chainId! === 11155420){
         
         getPositions(account!).then((position) => {
-        
+       
           setPositions(position);
         })
       }

@@ -46,12 +46,13 @@ export const transformHistory = (
 ): UserPositionEvent[] => {
   return positions
     .reduce((target: UserPositionEvent[], { position, history }) => {
+
       const enhancedHistory = history.map((current, idx) => {
         const isMarginChanging =
           current.type === OriginalPositionChangeStatuses.MarginChangin;
         const isClosing = current.type === OriginalPositionChangeStatuses.Closing;
         const prevEntry =
-          (isMarginChanging || isClosing) && idx > 0 ? history[idx - 1] : {};
+          (isMarginChanging || isClosing) && idx > 0 ? history[idx-1] : history[idx];
         const defaultProps = {
           ...prevEntry,
           amm: position.amm,
@@ -144,7 +145,7 @@ export const createHistoryGridData = (
     const [, quoteCcy] = pair.productIds;
     const size = toTokenUnit(historyEntry.size!);
     const direction = size.lt(0) ? Directions.Short : Directions.Long;
-    const leverage = toTokenUnit(historyEntry.leverage);
+    const leverage = historyEntry.leverage;
     const entryPrice = toTokenUnit(historyEntry.entryPrice);
     const totalPrice = entryPrice.multipliedBy(size).abs();
     const fee = toTokenUnit(historyEntry.fee!);
@@ -153,7 +154,7 @@ export const createHistoryGridData = (
       historyEntry.type as OriginalPositionChangeStatuses
     );
     const profitAndLoss = toTokenUnit(historyEntry.realizedPnl);
-
+    console.log("size ", formatNumber(size, { base: 8 }))
     return {
       pair,
       id: timestamp + pair.id,
@@ -161,7 +162,7 @@ export const createHistoryGridData = (
       direction: capitalize(direction),
       directionColor:
         direction === Directions.Long ? "alert.lemon" : "alert.guava",
-      leverage: `${formatNumber(leverage, { base: 1 })}X`,
+      leverage: `${leverage}X`,
       date: format(timestamp, "dd/MM/yyyy"),
       time: format(timestamp, "HH:mm:ss"),
       type: capitalize(type),
@@ -192,7 +193,6 @@ export const createNotificationHistoryData = (
       historyEntry.type as OriginalPositionChangeStatuses
     );
     const isOpen = status === PositionChangeStatuses.Open;
-      console.log("test")
     const commonProps = {
       id: timestamp + pair.id,
       productIds: pair.productIds,
@@ -250,14 +250,11 @@ const getPercent = (value: string) => {
     if(!value.includes(',')){
       let sValue = value.split('.')
       if(Number(value.slice(0,2)) < 0){
-        console.log("value ", value.slice(0,3))
         return [sValue[0].slice(0,3),sValue[1].slice(0,2)].join('.')
       }
-      console.log("value ", value.slice(0,3))
       return [sValue[0].slice(0,2),sValue[1].slice(0,2)].join('.')
     }
     let sValue = value.split('.')
-    console.log("value ", sValue.slice(0,3))
     let nValue = [Number(sValue.slice(0,2)) < 0? sValue[0].slice(0,3): sValue[0].slice(0,2), sValue[1].slice(0, 3)].join('.')
     return nValue
 }

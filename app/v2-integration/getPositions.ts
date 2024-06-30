@@ -77,11 +77,12 @@ export const getPositions = async (trader: string) =>{
     let lastValidPosition = undefined
     let lastTimeStamp = 0
     let visitedAmms: any[] = []
+    let his: any[] = []
     for(let i = 0; i< positions.length;i++){
-      if(visitedAmms.includes(positions[i].amm)){
-          continue
-      } else {
+      
+      
         const amm = new ethers.Contract(positions[i].amm, ammAbi,signer)  
+        visitedAmms.push(positions[i].amm)
         const fundingRate = await amm.fundingRate()
         let [size, margin, openNotional, , , ] = await clearingHouse.getPosition(positions[i].amm, trader)
         let leverage
@@ -91,25 +92,24 @@ export const getPositions = async (trader: string) =>{
           leverage = openNotional.d.div(margin.d)
         }
         let inputSize = await amm.getInputPrice(0, notionalToUsdcDecimals(openNotional))
-        let [notional, unPnL] = await clearingHouse.getPositionNotionalAndUnrealizedPnl(positions[i].amm, trader, 1)
-        console.log("pnl ", unPnL.toString())
+        let [notional, unPnL] = await clearingHouse.getPositionNotionalAndUnrealizedPnl(positions[i].amm, trader, 2)
+        
         let lastValidPosition = undefined
         if(isOpenPosition(positions[i].positionSizeAfter, size.toString()) && Number(size.toString()) != 0){
+          let unPrice: number = 0;
+          if(parseInt(positions[i].amm) == parseInt(EthUsdPriceId)){
+              unPrice = await fetchCurrentEthUsdPriceFromPythNetwork()    
+          }
+          if(parseInt(positions[i].amm) == parseInt(BtcUsdPriceId)){
+              unPrice = await fetchCurrentBtcUsdPriceFromPythNetwork()
+          }
+      
+          if(parseInt(positions[i].amm) == parseInt(SolUsdPriceId)){
+              unPrice = await fetchCurrentSolUsdPriceFromPythNetwork()
+          }
           if(lastTimeStamp < Number(positions[i].timestamp)){
-            let unPrice: number = 0;
-            if(parseInt(positions[i].amm) == parseInt(EthUsdPriceId)){
-                unPrice = await fetchCurrentEthUsdPriceFromPythNetwork()    
-            }
-            if(parseInt(positions[i].amm) == parseInt(BtcUsdPriceId)){
-                unPrice = await fetchCurrentBtcUsdPriceFromPythNetwork()
-            }
-        
-            if(parseInt(positions[i].amm) == parseInt(SolUsdPriceId)){
-                unPrice = await fetchCurrentSolUsdPriceFromPythNetwork()
-            }
+            
             let entryPrice = await getEntryPrice(positions[i].timestamp, positions[i].amm)
-            console.log("price oracle ", unPrice.toString())
-            console.log("funding rate ", fundingRate.toString())
             lastValidPosition = {
               amm: positions[i].amm,
               leverage: leverage.toString(),
@@ -130,22 +130,50 @@ export const getPositions = async (trader: string) =>{
               liquidationPenalty: positions[i].liquidationPenalty,
               timestamp: positions[i].timestamp,
             };
+          } 
+          
+          for(let j = i+1; j < positions.length; j++){
+            if(positions[i].amm == positions[j].amm){
+              let entryPrice = await getEntryPrice(positions[j].timestamp, positions[i].amm)
+              let lev = '0'
+              if(positions[j].margin == '0'){
+                lev = `${Math.round(Number(positions[j].positionNotional)) / Math.round(Number(positions[j+1].margin))}`
+              } else {
+                lev = `${Math.round(Number(positions[j].positionNotional)) / Math.round(Number(positions[j].margin))}`
+              }
+              if(Number(lev) < 1){
+                lev = '1'
+              }
+              his.push({
+                timestamp: positions[j].timestamp,
+                type: "Closing",
+                margin: positions[positions[j].margin == '0'? j+1:j].margin,
+                size: Number(positions[j].exchangedPositionSize) < 0 ? `${Number(positions[j].exchangedPositionSize) * (-1)}`: `${Number(positions[j].exchangedPositionSize)}`,
+                entryPrice: entryPrice,
+                underlyingPrice: `${Number(toUsdFormat(unPrice.toString())) + Number(fundingRate.div(10**12).toString())}`,
+                leverage: lev,
+                fee: positions[j].fee,
+                realizedPnl: positions[j].realizedPnl,
+                unrealizedPnlAfter: positions[j].unrealizedPnl,
+                amount: positions[j].positionNotional,
+                fundingPayment: positions[j].fundingPayment,
+                notification: true
+              })
+            }
           }
-          
-          
         
         }
-        
         if(lastValidPosition != undefined){
           positonArr.push({
             position: lastValidPosition,
-            history: []
+            history: his
           })
            
         }    
-      }
+        his = []
+      
     }
-    
+    console.log(positonArr)
     return positonArr
           
 }
