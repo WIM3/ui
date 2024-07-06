@@ -71,7 +71,6 @@ export const getPositions = async (trader: string) =>{
     const provider = new ethers.providers.Web3Provider((window as any).ethereum)
     const signer = provider.getSigner(trader)
     const clearingHouse = new ethers.Contract(process.env.CLEARING_HOUSE!, clearingHouseAbi, signer)
-    
 
     let positonArr: any[] = []
     let lastValidPosition = undefined
@@ -92,7 +91,7 @@ export const getPositions = async (trader: string) =>{
           leverage = openNotional.d.div(margin.d)
         }
         let inputSize = await amm.getInputPrice(0, notionalToUsdcDecimals(openNotional))
-        let [notional, unPnL] = await clearingHouse.getPositionNotionalAndUnrealizedPnl(positions[i].amm, trader, 2)
+        let [notional, unPnL] = await clearingHouse.getPositionNotionalAndUnrealizedPnl(positions[i].amm, trader, 0)
         
         let lastValidPosition = undefined
         if(isOpenPosition(positions[i].positionSizeAfter, size.toString()) && Number(size.toString()) != 0){
@@ -133,21 +132,17 @@ export const getPositions = async (trader: string) =>{
           } 
           
           for(let j = i+1; j < positions.length; j++){
-            if(positions[i].amm == positions[j].amm){
+            if(positions[i].amm == positions[j].amm && positions[j].margin == '0'){
               let entryPrice = await getEntryPrice(positions[j].timestamp, positions[i].amm)
-              let lev = '0'
-              if(positions[j].margin == '0'){
-                lev = `${Math.round(Number(positions[j].positionNotional)) / Math.round(Number(positions[j+1].margin))}`
-              } else {
-                lev = `${Math.round(Number(positions[j].positionNotional)) / Math.round(Number(positions[j].margin))}`
-              }
+              let lev = `${Math.round(Number(positions[j].positionNotional)) / Math.round(Number(positions[j+1].margin))}`
+              
               if(Number(lev) < 1){
                 lev = '1'
               }
               his.push({
                 timestamp: positions[j].timestamp,
                 type: "Closing",
-                margin: positions[positions[j].margin == '0'? j+1:j].margin,
+                margin: positions[j+1].margin,
                 size: Number(positions[j].exchangedPositionSize) < 0 ? `${Number(positions[j].exchangedPositionSize) * (-1)}`: `${Number(positions[j].exchangedPositionSize)}`,
                 entryPrice: entryPrice,
                 underlyingPrice: `${Number(toUsdFormat(unPrice.toString())) + Number(fundingRate.div(10**12).toString())}`,

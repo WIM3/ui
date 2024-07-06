@@ -140,13 +140,15 @@ export const createPositionGridData = (
 export const createHistoryGridData = (
   history: UserPositionEvent[]
 ): HistoryGridData[] => {
+  // console.log("history ", history)
   return history.map((historyEntry) => {
     const pair = getPair(historyEntry.pairId);
     const [, quoteCcy] = pair.productIds;
     const size = toTokenUnit(historyEntry.size!);
+
     const direction = size.lt(0) ? Directions.Short : Directions.Long;
     const leverage = historyEntry.leverage;
-    const entryPrice = toTokenUnit(historyEntry.entryPrice);
+    const entryPrice = toTokenUnit(historyEntry.entryPrice,6);
     const totalPrice = entryPrice.multipliedBy(size).abs();
     const fee = toTokenUnit(historyEntry.fee!);
     const timestamp = secondsToMilliseconds(historyEntry.timestamp);
@@ -154,7 +156,6 @@ export const createHistoryGridData = (
       historyEntry.type as OriginalPositionChangeStatuses
     );
     const profitAndLoss = toTokenUnit(historyEntry.realizedPnl);
-    console.log("size ", formatNumber(size, { base: 8 }))
     return {
       pair,
       id: timestamp + pair.id,
@@ -166,7 +167,7 @@ export const createHistoryGridData = (
       date: format(timestamp, "dd/MM/yyyy"),
       time: format(timestamp, "HH:mm:ss"),
       type: capitalize(type),
-      amount: formatNumber(size, { base: 2 }),
+      amount: historyEntry.size!.slice(0,4),
       price: formatUsdValue(entryPrice),
       total: formatUsdValue(totalPrice),
       fee: formatUsdValue(fee),
