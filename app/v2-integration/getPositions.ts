@@ -132,9 +132,23 @@ export const getPositions = async (trader: string) =>{
           } 
           
           for(let j = i+1; j < positions.length; j++){
+            if(his.length == 3){
+              break
+            }
             if(positions[i].amm == positions[j].amm && positions[j].margin == '0'){
               let entryPrice = await getEntryPrice(positions[j].timestamp, positions[i].amm)
-              let lev = `${Math.round(Number(positions[j].positionNotional)) / Math.round(Number(positions[j+1].margin))}`
+              console.log("amm: ", positions[i].amm)
+              console.log("notional: ",Math.round(Number(positions[j].positionNotional)))
+              
+              let nextValid = 0
+              for(let c = j; c < positions.length; c++){
+                  if(Number(positions[c].margin) > 0 && Number(positions[c].amm) == Number(positions[j].amm)) {
+                    nextValid = c
+                    break
+                  }
+              }
+              console.log("margin: ",Math.round(Number(positions[nextValid].margin)))
+              let lev = `${Math.round(Number(positions[j].positionNotional)) / Math.round(Number(positions[nextValid].margin))}`
               
               if(Number(lev) < 1){
                 lev = '1'
@@ -142,7 +156,7 @@ export const getPositions = async (trader: string) =>{
               his.push({
                 timestamp: positions[j].timestamp,
                 type: "Closing",
-                margin: positions[j+1].margin,
+                margin: positions[nextValid].margin,
                 size: Number(positions[j].exchangedPositionSize) < 0 ? `${Number(positions[j].exchangedPositionSize) * (-1)}`: `${Number(positions[j].exchangedPositionSize)}`,
                 entryPrice: entryPrice,
                 underlyingPrice: `${Number(toUsdFormat(unPrice.toString())) + Number(fundingRate.div(10**12).toString())}`,
