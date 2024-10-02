@@ -62,6 +62,7 @@ export interface PositionData {
   liquidationPenalty: string;
   fundingPayment: string;
   totalPnlAmount: string;
+  liquidationFeeRatio: string;
 }
 
 export interface Position {
