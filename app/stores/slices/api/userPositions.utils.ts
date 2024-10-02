@@ -81,7 +81,10 @@ export const createPositionGridData = (
     return position.active === true;
   });
 
+
   return activePositions.map((position) => {
+    
+  
     let pair = getPair(PairId.ETHUSDC);;
     if(parseInt(position.amm) == parseInt(BtcUsdPriceId)){
         pair = getPair(PairId.BTCUSDC);
@@ -105,7 +108,7 @@ export const createPositionGridData = (
       productId: quoteCcy,
     });
     const liquidationPrice = formatUsdValue(
-      openNotional.multipliedBy(new BigNumber(process.env.LIQ_FEE_RATIO!))
+      openNotional.multipliedBy(new BigNumber(position.liquidationFeeRatio))
     );
     const profitAndLoss = toTokenUnit(position.unrealizedPnl,6);
     const formattedProfitAndLoss = toUSDWithDot(profitAndLoss.toString())
