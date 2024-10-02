@@ -71,6 +71,8 @@ export const getPositions = async (trader: string) =>{
     const provider = new ethers.providers.Web3Provider((window as any).ethereum)
     const signer = provider.getSigner(trader)
     const clearingHouse = new ethers.Contract(process.env.CLEARING_HOUSE!, clearingHouseAbi, signer)
+    const lfr = await clearingHouse.liquidationFeeRatio()
+    console.log("lfr ", lfr.toString())
 
     let positonArr: any[] = []
     let lastValidPosition = undefined
@@ -128,6 +130,7 @@ export const getPositions = async (trader: string) =>{
               realizedPnl: positions[i].realizedPnl,
               liquidationPenalty: positions[i].liquidationPenalty,
               timestamp: positions[i].timestamp,
+              liquidationFeeRatio: lfr.toString()
             };
           } 
           
@@ -137,9 +140,6 @@ export const getPositions = async (trader: string) =>{
             }
             if(positions[i].amm == positions[j].amm && positions[j].margin == '0'){
               let entryPrice = await getEntryPrice(positions[j].timestamp, positions[i].amm)
-              console.log("amm: ", positions[i].amm)
-              console.log("notional: ",Math.round(Number(positions[j].positionNotional)))
-              
               let nextValid = 0
               for(let c = j; c < positions.length; c++){
                   if(Number(positions[c].margin) > 0 && Number(positions[c].amm) == Number(positions[j].amm)) {
@@ -147,7 +147,6 @@ export const getPositions = async (trader: string) =>{
                     break
                   }
               }
-              console.log("margin: ",Math.round(Number(positions[nextValid].margin)))
               let lev = `${Math.round(Number(positions[j].positionNotional)) / Math.round(Number(positions[nextValid].margin))}`
               
               if(Number(lev) < 1){
@@ -182,7 +181,6 @@ export const getPositions = async (trader: string) =>{
         his = []
       
     }
-    console.log(positonArr)
     return positonArr
           
 }
