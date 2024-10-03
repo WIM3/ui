@@ -108,7 +108,7 @@ export const createPositionGridData = (
       productId: quoteCcy,
     });
     const liquidationPrice = formatUsdValue(
-      openNotional.multipliedBy(new BigNumber(position.liquidationFeeRatio))
+      openNotional.multipliedBy(new BigNumber(liqFeeRationToUSDC(position.liquidationFeeRatio)))
     );
     const profitAndLoss = toTokenUnit(position.unrealizedPnl,6);
     const formattedProfitAndLoss = toUSDWithDot(profitAndLoss.toString())
@@ -236,6 +236,10 @@ const toUSD = (value: string, isBtc: boolean) => {
   let beforeComma = units.slice(0,units.length > 4?2:1)
   let afterComma = units.slice(units.length > 4?2:1, units.length)
   return ['$ ',[[beforeComma,afterComma].join(','),decimals].join('.')].join('')
+}
+
+const liqFeeRationToUSDC = (value: string) => {
+  return '0.'+value+'0'.repeat(4)
 }
 
 const toUSDWithDot = (value: string) => {
